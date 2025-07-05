@@ -10,6 +10,9 @@ import HealthTrack from "./Health-track"
 import Profile from "./Profile"
 
 const ContentContainer = () => {
+  // State untuk mengecek apakah user sudah login
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  
   // Baca halaman terakhir dari localStorage, default ke "home" jika tidak ada
   const [currentPage, setCurrentPage] = useState(() => {
     if (typeof window !== "undefined") {
@@ -24,6 +27,14 @@ const ContentContainer = () => {
     profilePicture: "/placeholder.svg?height=40&width=40",
   })
 
+  // Check authentication status saat component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      setIsAuthenticated(true)
+    }
+  }, [])
+
   // Simpan halaman aktif ke localStorage setiap kali berubah
   useEffect(() => {
     localStorage.setItem("currentPage", currentPage)
@@ -31,7 +42,18 @@ const ContentContainer = () => {
 
   // Fungsi untuk mengubah halaman aktif
   const handleNavigation = (page) => {
+    if (page === "home") {
+      setIsAuthenticated(true)
+    }
     setCurrentPage(page)
+  }
+
+  // Fungsi untuk logout
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("currentPage")
+    setIsAuthenticated(false)
+    setCurrentPage("home")
   }
 
   // Fungsi untuk merender komponen halaman yang sesuai
@@ -51,12 +73,22 @@ const ContentContainer = () => {
         return <Home />
     }
   }
-  <Login onNavigate={handleNavigation} />
 
+  // Jika belum login, tampilkan Login component
+  if (!isAuthenticated) {
+    return <Login onNavigate={handleNavigation} />
+  }
+
+  // Jika sudah login, tampilkan content utama
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar dirender di sini dan mengontrol navigasi */}
-      <Navbar user={user} currentPage={currentPage} onNavigate={handleNavigation} />
+      <Navbar 
+        user={user} 
+        currentPage={currentPage} 
+        onNavigate={handleNavigation}
+        onLogout={handleLogout}
+      />
 
       {/* Area konten utama */}
       {renderCurrentPage()}

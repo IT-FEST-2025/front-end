@@ -1,23 +1,23 @@
-// cek tampilan awal
-import AuthContainer from "../src/components/auth-container"
+// cek tampilan awal dengan login terintegrasi
+import ContentContainer from "./components/content/content-container"
 
 function App() {
-  return <AuthContainer />
+  return <ContentContainer />
 }
 
 export default App
 
-// cek tampilan setelah login
-// import ContentContainer from "./components/content/content-container"
+// cek tampilan dengan AuthContainer terpisah (tidak digunakan lagi)
+// import AuthContainer from "../src/components/auth-container"
 
 // function App() {
-//   return <ContentContainer />
+//   return <AuthContainer />
 // }
 
 // export default App
 
 
-// dipake kalo udah sambungin ke db
+// dipake kalo udah sambungin ke db (tidak diperlukan lagi karena sudah terintegrasi di ContentContainer)
 
 // import { useState, useEffect } from "react"
 // import AuthContainer from "./components/auth-container"
@@ -42,5 +42,3 @@ export default App
 
 //   return isAuthenticated ? <ContentContainer /> : <AuthContainer />
 // }
-
-// export default App
