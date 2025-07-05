@@ -2,7 +2,7 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 // Pastikan path impor ini benar berdasarkan struktur folder Anda
-import HomeAuth from "./Home";         // Ini adalah Home untuk AuthContainer (landing page)
+import HomeAuth from "./Home";
 import Login from "./Login";
 import Register from "./Register";
 import Reset from "./Reset";
@@ -25,8 +25,10 @@ const AuthContainer = ({ onLoginSuccess }) => {
         element={
           <Login
             onLoginSuccess={() => {
-              onLoginSuccess();
-              navigate('/'); // Arahkan ke root setelah login berhasil (root ContentContainer)
+              if (typeof onLoginSuccess === 'function') {
+                onLoginSuccess();
+              }
+              navigate('/beranda');
             }}
           />
         }
