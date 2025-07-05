@@ -1,14 +1,35 @@
 // navbar di tampilan setelah login
-
 import { useState, useEffect, useRef } from "react"
+import { useLocation } from "react-router-dom"
 import { getProfileImageUrl } from "../../utils/profile-images"
 
-const Navbar = ({ user, currentPage, onNavigate, onLogout }) => {
+const Navbar = ({ user, onNavigate, onLogout }) => {
+  const location = useLocation()
   const [isScrolled, setIsScrolled] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false) // For profile dropdown
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false) // For mobile navigation dropdown
   const dropdownRef = useRef(null)
   const mobileNavRef = useRef(null) // Ref for mobile navigation dropdown
+
+  const getCurrentPage = () => {
+    switch (location.pathname) {
+      case "/":
+      case "/beranda":
+        return "home";
+      case "/symptom":
+        return "symptom";
+      case "/chatbot":
+        return "chatbot";
+      case "/health-tracker":
+        return "health-tracker";
+      case "/profile":
+        return "profile";
+      default:
+        return "home";
+    }
+  };
+
+  const currentPage = getCurrentPage()
 
   useEffect(() => {
     const handleScroll = () => {

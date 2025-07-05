@@ -20,7 +20,9 @@ const ContentContainer = ({ onLogout }) => {
 
   // Fungsi untuk navigasi dari Navbar
   const handleNavigation = (page) => {
-    navigate(page === "home" ? "/beranda" : `/${page}`)
+    const targetPath = page === "home" ? "/beranda" : `/${page}`
+    console.log(`Navigating to: ${targetPath}`)
+    navigate(targetPath)
   }
 
   // Fungsi untuk logout
@@ -36,7 +38,11 @@ const ContentContainer = ({ onLogout }) => {
       {/* Navbar selalu tampil */}
       <Navbar
         user={user}
-        currentPage={location.pathname === "/" ? "home" : location.pathname.replace("/", "")}
+        currentPage={
+          location.pathname === "/beranda" || location.pathname === "/"
+            ? "home"
+            : location.pathname.replace("/", "")
+        }
         onNavigate={handleNavigation}
         onLogout={handleLogout}
       />

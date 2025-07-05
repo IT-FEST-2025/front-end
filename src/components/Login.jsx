@@ -40,8 +40,6 @@ const Login = ({ onLoginSuccess }) => {
       }
 
       localStorage.setItem("token", result.token);
-      alert("Login berhasil!");
-
       // Panggil prop onLoginSuccess yang akan memperbarui state di App.jsx
       // dan kemudian navigasi ke halaman utama aplikasi
       if (onLoginSuccess) {
