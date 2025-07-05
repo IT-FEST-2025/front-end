@@ -20,7 +20,7 @@ const ContentContainer = () => {
 
   // Fungsi untuk navigasi dari Navbar
   const handleNavigation = (page) => {
-    navigate(page === "home" ? "/" : `/${page}`)
+    navigate(page === "home" ? "/beranda" : `/${page}`)
   }
 
   return (
@@ -34,7 +34,7 @@ const ContentContainer = () => {
 
       {/* Konten halaman sesuai URL */}
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/beranda" element={<Home />} />
         <Route path="/symptom" element={<Symptom />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/health-tracker" element={<HealthTrack />} />

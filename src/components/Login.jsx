@@ -48,7 +48,7 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess();
       }
       // Navigasi ke root path ("/") yang akan ditangani oleh ContentContainer
-      navigate("/"); // <--- PENTING: Mengarahkan ke rute utama ContentContainer
+      navigate("/beranda");
     } catch (err) {
       alert("Gagal login: " + err.message);
     }
