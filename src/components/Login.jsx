@@ -25,7 +25,7 @@ const Login = ({ onLoginSuccess }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(`${config.apiUserService}/api/register`, {
+      const response = await fetch(`${config.apiUserService}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
