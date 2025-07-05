@@ -20,9 +20,8 @@ const ContentContainer = ({ onLogout }) => {
 
   // Fungsi untuk navigasi dari Navbar
   const handleNavigation = (page) => {
-    const targetPath = page === "home" ? "/beranda" : `/${page}`
-    console.log(`Navigating to: ${targetPath}`)
-    navigate(targetPath)
+    const targetPath = page === "home" ? "/beranda" : `/${page}`;
+    navigate(targetPath);
   }
 
   // Fungsi untuk logout
