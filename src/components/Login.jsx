@@ -5,7 +5,7 @@ import Layout from "./layout/layout"
 import FormInput from "./ui/form-input"
 import SubmitButton from "./ui/submit-button"
 
-const Login = ({ onNavigateToRegister, onNavigateToReset }) => {
+const Login = ({ onNavigateToRegister, onNavigateToReset, onNavigate }) => {
   const initialValues = {
     username: "",
     password: "",
@@ -39,11 +39,12 @@ const Login = ({ onNavigateToRegister, onNavigateToReset }) => {
 
     alert("Login berhasil!");
 
-    // Di sini kamu bisa arahkan user ke dashboard atau halaman utama
-    // Misalnya: onNavigateToHome?.();
+    if (typeof onNavigate === "function") {
+      onNavigate("home")
+    }
 
   } catch (err) {
-    alert("Gagal login: " + err.message);
+    alert("Gagal login: " + err.message); 
   }
 };
 

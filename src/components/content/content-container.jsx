@@ -1,6 +1,7 @@
 // menggabungkan home, symptom, health track, chatbot, profil jadi satu wadah
 
 import { useState, useEffect } from "react"
+import Login from "../Login"
 import Navbar from "./Navbar"
 import Home from "./Home"
 import Symptom from "./Symptom"
@@ -50,6 +51,7 @@ const ContentContainer = () => {
         return <Home />
     }
   }
+  <Login onNavigate={handleNavigation} />
 
   return (
     <div className="min-h-screen bg-white">
