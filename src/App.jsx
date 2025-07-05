@@ -12,13 +12,19 @@ function App() {
     setIsAuthenticated(!!token);
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
   return (
     <BrowserRouter>
       <Routes>
         {isAuthenticated ? (
-          <Route path="/*" element={<ContentContainer />} />
+          <Route path="/*" element={<ContentContainer onLogout={handleLogout} />} />
         ) : (
-          <Route path="/*" element={<AuthContainer onLoginSuccess={() => setIsAuthenticated(true)} />} />
+          <Route path="/*" element={<AuthContainer onLoginSuccess={() =>
+            setIsAuthenticated(true)} />} />
         )}
       </Routes>
     </BrowserRouter>

@@ -8,7 +8,7 @@ import Chatbot from "./Chatbot"
 import HealthTrack from "./Health-track"
 import Profile from "./Profile"
 
-const ContentContainer = () => {
+const ContentContainer = ({ onLogout }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -23,6 +23,14 @@ const ContentContainer = () => {
     navigate(page === "home" ? "/beranda" : `/${page}`)
   }
 
+  // Fungsi untuk logout
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar selalu tampil */}
@@ -30,6 +38,7 @@ const ContentContainer = () => {
         user={user}
         currentPage={location.pathname === "/" ? "home" : location.pathname.replace("/", "")}
         onNavigate={handleNavigation}
+        onLogout={handleLogout}
       />
 
       {/* Konten halaman sesuai URL */}

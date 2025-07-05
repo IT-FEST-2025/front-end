@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { getProfileImageUrl } from "../../utils/profile-images"
 
-const Navbar = ({ user, currentPage, onNavigate }) => {
+const Navbar = ({ user, currentPage, onNavigate, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false) // For profile dropdown
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false) // For mobile navigation dropdown
@@ -35,7 +35,7 @@ const Navbar = ({ user, currentPage, onNavigate }) => {
   }, [])
 
   const handleLogout = () => {
-    console.log("Logging out...")
+    onLogout()
     setIsDropdownOpen(false)
   }
 
