@@ -21,10 +21,25 @@ function App() {
     <BrowserRouter>
       <Routes>
         {isAuthenticated ? (
-          <Route path="/*" element={<ContentContainer onLogout={handleLogout} />} />
+          <>
+            <Route path="/beranda" element={<ContentContainer onLogout={handleLogout} />} />
+            <Route path="/symptom" element={<ContentContainer onLogout={handleLogout} />} />
+            <Route path="/chatbot" element={<ContentContainer onLogout={handleLogout} />} />
+            <Route path="/health-tracker" element={<ContentContainer onLogout={handleLogout} />} />
+            <Route path="/profile" element={<ContentContainer onLogout={handleLogout} />} />
+            {/* Redirect any unmatched routes to /beranda for authenticated users */}
+            <Route path="*" element={<Navigate to="/beranda" replace />} />
+          </>
         ) : (
-          <Route path="/*" element={<AuthContainer onLoginSuccess={() =>
-            setIsAuthenticated(true)} />} />
+          <>
+            <Route path="/*" element={<AuthContainer onLoginSuccess={() => setIsAuthenticated(true)} />} />
+            {/* Redirect protected routes to root for unauthenticated users */}
+            <Route path="/beranda" element={<Navigate to="/" replace />} />
+            <Route path="/symptom" element={<Navigate to="/" replace />} />
+            <Route path="/chatbot" element={<Navigate to="/" replace />} />
+            <Route path="/health-tracker" element={<Navigate to="/" replace />} />
+            <Route path="/profile" element={<Navigate to="/" replace />} />
+          </>
         )}
       </Routes>
     </BrowserRouter>
