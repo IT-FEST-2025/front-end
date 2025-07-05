@@ -1,5 +1,5 @@
 // cek tampilan awal
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import AuthContainer from './components/auth-container';
 import ContentContainer from './components/content/content-container';
