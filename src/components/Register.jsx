@@ -1,3 +1,4 @@
+import { config } from "../config"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
 import Layout from "./layout/layout"
@@ -24,7 +25,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("http://localhost:3000/api/register", {
+      const response = await fetch(`${config.apiUserService}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
