@@ -1,11 +1,11 @@
 // cek tampilan awal
 import { BrowserRouter } from 'react-router-dom';
-import ContentContainer from './components/content/content-container';
+import AuthContainer from './components/auth-container';
 
 function App() {
   return (
     <BrowserRouter>
-      <ContentContainer />
+      <AuthContainer />
     </BrowserRouter>
   );
 }
