@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-export const useResponsiveBackground = (basePath = "/src/assets/Register") => {
+export const useResponsiveBackground = (basePath = "/assets/Register") => {
   const [backgroundImage, setBackgroundImage] = useState(`${basePath}.png`)
 
   useEffect(() => {
