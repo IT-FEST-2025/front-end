@@ -1,76 +1,74 @@
+// src/components/Login.jsx
 import { config } from "../config"
-import { useForm } from "../hooks/form"
-import { validationRules } from "../utils/validasi"
-import Layout from "./layout/layout"
-import FormInput from "./ui/form-input"
-import SubmitButton from "./ui/submit-button"
+import { useNavigate } from 'react-router-dom';
+import { useForm } from "../hooks/form";
+import { validationRules } from "../utils/validasi";
+import Layout from "./layout/layout"; // Perhatikan path
+import FormInput from "./ui/form-input"; // Perhatikan path
+import SubmitButton from "./ui/submit-button"; // Perhatikan path
 
-const Login = ({ onNavigateToRegister, onNavigateToReset, onNavigate }) => {
+// Menerima prop onLoginSuccess
+const Login = ({ onLoginSuccess }) => {
+  const navigate = useNavigate();
+
   const initialValues = {
     username: "",
     password: "",
-  }
+  };
 
   const validation = {
     username: [validationRules.required, validationRules.minLength(1)],
     password: [validationRules.required, validationRules.minLength(1)],
-  }
+  };
 
-  const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation)
+  const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation);
 
   const onSubmit = async (data) => {
-  try {
-    const response = await fetch(`${config.apiUserService}/api/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
+    try {
+      const response = await fetch(`${config.apiUserService}/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.message || "Login gagal");
+      if (!response.ok) {
+        throw new Error(result.message || "Login gagal");
+      }
+
+      localStorage.setItem("token", result.token);
+      alert("Login berhasil!");
+
+      // Panggil prop onLoginSuccess yang akan memperbarui state di App.jsx
+      // dan kemudian navigasi ke halaman utama aplikasi
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+      // Navigasi ke root path ("/") yang akan ditangani oleh ContentContainer
+      navigate("/"); // <--- PENTING: Mengarahkan ke rute utama ContentContainer
+    } catch (err) {
+      alert("Gagal login: " + err.message);
     }
-
-    // Simpan token JWT ke localStorage
-    localStorage.setItem("token", result.token);
-
-    alert("Login berhasil!");
-
-    if (typeof onNavigate === "function") {
-      onNavigate("home")
-    }
-
-  } catch (err) {
-    alert("Gagal login: " + err.message); 
-  }
-};
+  };
 
   const handleFormSubmit = async (e) => {
-    e.preventDefault()
-    await handleSubmit(onSubmit)
-  }
+    e.preventDefault();
+    await handleSubmit(onSubmit);
+  };
 
   const handleSignUpClick = () => {
-    if (onNavigateToRegister) {
-      onNavigateToRegister()
-    } else {
-      console.log("Navigate to Register")
-    }
-  }
+    navigate("/register"); // Arahkan ke halaman register
+  };
 
   const handleForgotPasswordClick = () => {
-    if (onNavigateToReset) {
-      onNavigateToReset()
-    } else {
-      console.log("Navigate to Forgot Password")
-    }
-  }
+    navigate("/reset"); // Arahkan ke halaman reset password
+  };
 
   return (
-    <Layout title="Sign In" onBack={onNavigateToRegister}>
+    <Layout title="Sign In" onBack={() => navigate('/')}> {/* Atau sesuaikan onBack */}
       <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-5" noValidate>
         <FormInput
           id="username"
@@ -97,7 +95,6 @@ const Login = ({ onNavigateToRegister, onNavigateToReset, onNavigate }) => {
           required
         />
 
-        {/* Forgot Password Link */}
         <div className="text-right">
           <button
             type="button"
@@ -114,7 +111,6 @@ const Login = ({ onNavigateToRegister, onNavigateToReset, onNavigate }) => {
           </SubmitButton>
         </div>
 
-        {/* Sign Up Link */}
         <div className="text-center py-2">
           <p className="cursor-default text-white text-xs sm:text-sm">
             {"Belum punya akun? "}
@@ -129,7 +125,7 @@ const Login = ({ onNavigateToRegister, onNavigateToReset, onNavigate }) => {
         </div>
       </form>
     </Layout>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
