@@ -291,7 +291,7 @@ const Profile = ({ user = {} }) => {
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         setShowSuccessPopup(true);
       } else {
         console.error("Gagal memperbarui profil:", result.message);
