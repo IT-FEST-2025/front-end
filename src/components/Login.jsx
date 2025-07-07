@@ -40,8 +40,11 @@ const Login = ({ onLoginSuccess }) => {
       }
 
       localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify({ username: data.username,
-      fullName: result.fullName || data.username }))
+      localStorage.setItem("user", JSON.stringify({ 
+        username: data.username, 
+        fullName: result.fullName || data.username,
+        email: result.email || ""
+      }));
       if (onLoginSuccess) {
         onLoginSuccess();
       }

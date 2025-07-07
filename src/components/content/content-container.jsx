@@ -29,9 +29,10 @@ const ContentContainer = ({ onLogout }) => {
         })
           .then((response) => response.json())
           .then((result) => {
-            if (result.username) {
-              setUser({ username: result.username, fullName: result.fullName });
-              localStorage.setItem("user", JSON.stringify({ username: result.username, fullName: result.fullName }));
+            if (result.username && result.email) {
+              const userData = { username: result.username, fullName: result.fullName, email: result.email };
+              setUser(userData);
+              localStorage.setItem("user", JSON.stringify(userData));
             } else {
               navigate("/login");
             }
