@@ -1,22 +1,51 @@
 // menggabungkan home, symptom, health track, chatbot, profil jadi satu wadah
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "./Navbar"
 import Home from "./Home"
 import Symptom from "./Symptom"
 import Chatbot from "./Chatbot"
 import HealthTrack from "./Health-track"
 import Profile from "./Profile"
+import { config } from "../../config"
 
 const ContentContainer = ({ onLogout }) => {
   const navigate = useNavigate()
   const location = useLocation()
+  const [user, setUser] = useState(null)
 
-  const [user] = useState({
-    username: "Contoh",
-    email: "contoh@email.com",
-    profilePicture: "/placeholder.svg?height=40&width=40",
-  })
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      const token = localStorage.getItem("token");
+      if (token) {
+        fetch(`${config.apiUserService}/api/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((result) => {
+            if (result.username) {
+              setUser({ username: result.username, fullName: result.fullName });
+              localStorage.setItem("user", JSON.stringify({ username: result.username, fullName: result.fullName }));
+            } else {
+              navigate("/login");
+            }
+          })
+          .catch(() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            navigate("/login");
+          });
+      } else {
+        navigate("/login");
+      }
+    }
+  }, [navigate])
 
   // Fungsi untuk navigasi dari Navbar
   const handleNavigation = (page) => {

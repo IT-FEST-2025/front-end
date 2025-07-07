@@ -40,8 +40,8 @@ const Login = ({ onLoginSuccess }) => {
       }
 
       localStorage.setItem("token", result.token);
-      // Panggil prop onLoginSuccess yang akan memperbarui state di App.jsx
-      // dan kemudian navigasi ke halaman utama aplikasi
+      localStorage.setItem("user", JSON.stringify({ username: data.username,
+      fullName: result.fullName || data.username }))
       if (onLoginSuccess) {
         onLoginSuccess();
       }
