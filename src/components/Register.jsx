@@ -39,6 +39,10 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
         throw new Error(result.message || "Registrasi gagal");
       }
 
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+      }
+
       localStorage.setItem("user", JSON.stringify({ 
         username: data.username, 
         fullName: data.fullName,
