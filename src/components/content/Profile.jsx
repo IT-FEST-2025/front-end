@@ -1,6 +1,5 @@
 import { config } from "../../config"
 import { useState, useRef } from "react"
-import { getProfileImageUrl } from "../../utils/profile-images"
 
 const Profile = ({ user = {} }) => {
   // State untuk form data
@@ -17,7 +16,7 @@ const Profile = ({ user = {} }) => {
   })
 
   // Use the utility function for initial profile image
-  const [profileImage, setProfileImage] = useState(getProfileImageUrl(user?.profilePicture))
+  const [profileImage, setProfileImage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [showImageViewer, setShowImageViewer] = useState(false)
@@ -536,7 +535,7 @@ const Profile = ({ user = {} }) => {
                       value={formData.username}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
-                      placeholder="Masukkan username"
+                      placeholder=""
                     />
                   </div>
                 </div>
@@ -545,7 +544,7 @@ const Profile = ({ user = {} }) => {
               {/* Full Name di bawah foto profil */}
               <div className="space-y-2" style={{ marginLeft: "0px" }}>
                 <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700">Full Name</label>
+                  <label className="text-sm font-medium text-gray-700">Nama Lengkap</label>
                 </div>
                 <input
                   type="text"
@@ -553,7 +552,7 @@ const Profile = ({ user = {} }) => {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
-                  placeholder="Masukkan nama lengkap"
+                  placeholder=""
                 />
               </div>
             </div>
@@ -562,7 +561,7 @@ const Profile = ({ user = {} }) => {
 
             {/* Email Field (Read-only) - Full Width */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">E-mail</label>
+              <label className="text-sm font-medium text-gray-700">Alamat E-mail</label>
               <input
                 type="email"
                 value={formData.email}
@@ -611,9 +610,8 @@ const Profile = ({ user = {} }) => {
                 value={formData.age}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
-                placeholder="Masukkan umur"
-                min="1"
-                max="120"
+                placeholder=""
+                min="0"
               />
             </div>
 
@@ -631,9 +629,8 @@ const Profile = ({ user = {} }) => {
                     value={formData.height}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors pr-12"
-                    placeholder="Masukkan tinggi badan"
-                    min="50"
-                    max="250"
+                    placeholder=""
+                    min="0"
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">cm</span>
                 </div>
@@ -651,9 +648,8 @@ const Profile = ({ user = {} }) => {
                     value={formData.weight}
                     onChange={handleInputChange}
                     className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors pr-12"
-                    placeholder="Masukkan berat badan"
-                    min="20"
-                    max="300"
+                    placeholder=""
+                    min="0"
                   />
                   <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500">kg</span>
                 </div>
