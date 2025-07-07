@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import LoadingSpinner from "../ui/loading"
 
-const Chatbot = () => {
+const Chatbot = ({ user }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -442,7 +442,7 @@ const Chatbot = () => {
               // Welcome Screen
               <div className="h-full flex items-center justify-center px-20 lg:px-32 py-6 lg:py-8">
                 <div className="text-center max-w-2xl w-full">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Halo, Nama!</h2>
+                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Halo, {user?.username || "Nama"}!</h2>
                   <p className="text-gray-600 mb-6 lg:mb-8 text-sm lg:text-base">
                     Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
                   </p>

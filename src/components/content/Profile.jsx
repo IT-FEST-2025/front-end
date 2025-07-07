@@ -6,7 +6,7 @@ const Profile = ({ user = {} }) => {
   const [formData, setFormData] = useState({
     username: user?.username || "",
     fullName: user?.fullName || "",
-    email: user?.email || "contoh@email.com",
+    email: user?.email || "",
     gender: user?.gender || "",
     age: user?.age || "",
     height: user?.height || "",
