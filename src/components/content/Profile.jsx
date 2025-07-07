@@ -273,6 +273,23 @@ const Profile = ({ user = {} }) => {
       setIsLoading(false)
       setShowSuccessPopup(true)
 
+      // Simpan ke localStorage
+      const updatedUser = {
+        ...user,
+        username: formData.username,
+        fullName: formData.fullName,
+        email: formData.email,
+        gender: formData.gender,
+        age: formData.age,
+        height: formData.height,
+        weight: formData.weight,
+        medicalHistory: formData.medicalHistory,
+        isActiveSmoker: formData.isActiveSmoker,
+        profilePicture: profileImage,
+      }
+
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+
       // Hide popup after 3 seconds
       setTimeout(() => {
         setShowSuccessPopup(false)

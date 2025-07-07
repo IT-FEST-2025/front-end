@@ -80,7 +80,7 @@ const ContentContainer = ({ onLogout }) => {
       <Routes>
         <Route path="/beranda" element={<Home />} />
         <Route path="/symptom" element={<Symptom />} />
-        <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/chatbot" element={<Chatbot user={user} />} />
         <Route path="/health-tracker" element={<HealthTrack />} />
         <Route path="/profile" element={<Profile user={user} />} />
         <Route path="*" element={<Home />} />
