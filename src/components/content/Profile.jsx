@@ -1,3 +1,4 @@
+import { config } from "../../config"
 import { useState, useRef } from "react"
 import { getProfileImageUrl } from "../../utils/profile-images"
 
@@ -268,34 +269,43 @@ const Profile = ({ user = {} }) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      setShowSuccessPopup(true)
+    try {
+      const updateFields = {
+        age: parseInt(formData.age),
+        gender: formData.gender || "lainnya",
+        height_cm: parseInt(formData.height),
+        weight_kg: parseInt(formData.weight),
+        smoking_status: formData.isActiveSmoker === "Ya" ? "aktif" : "tidak aktif",
+        chronic_diseases: formData.medicalHistory
+          .split(",")
+          .map((item) => item.trim())
+          .filter((item) => item !== ""),
+      };
 
-      // Simpan ke localStorage
-      const updatedUser = {
-        ...user,
-        username: formData.username,
-        fullName: formData.fullName,
-        email: formData.email,
-        gender: formData.gender,
-        age: formData.age,
-        height: formData.height,
-        weight: formData.weight,
-        medicalHistory: formData.medicalHistory,
-        isActiveSmoker: formData.isActiveSmoker,
-        profilePicture: profileImage,
+      const response = await fetch(`${config.apiUserService}/api/update/profile`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ updateFields }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setShowSuccessPopup(true);
+      } else {
+        console.error("Gagal memperbarui profil:", result.message);
+        alert("Gagal menyimpan data ke server.");
       }
-
-      localStorage.setItem("user", JSON.stringify(updatedUser))
-
-      // Hide popup after 3 seconds
-      setTimeout(() => {
-        setShowSuccessPopup(false)
-      }, 3000)
-    }, 1500)
-  }
+    } catch (error) {
+      console.error("Error saat menyimpan profil:", error);
+      alert("Terjadi kesalahan saat menyimpan data.");
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setShowSuccessPopup(false), 1500);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 relative">
