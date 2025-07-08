@@ -438,45 +438,108 @@ const Chatbot = ({ user }) => {
           </button>
         )}
 
-        {/* Messages Container */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto">
-            {messages.length === 1 ? (
-              // Welcome Screen
-              <div className="h-full flex items-center justify-center px-8 lg:px-16 py-6 lg:py-8">
-                <div className="text-center max-w-3xl w-full">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">
-                    Halo, {user?.username || "Nama"}!
-                  </h2>
-                  <p className="text-gray-600 mb-6 lg:mb-8 text-sm lg:text-base">
-                    Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
-                  </p>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Sidebar Toggle Button - Half Circle */}
+          {!isSidebarOpen && (
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              style={{
+                width: "32px",
+                height: "64px",
+                borderTopRightRadius: "32px",
+                borderBottomRightRadius: "32px",
+                borderTopLeftRadius: "0",
+                borderBottomLeftRadius: "0",
+              }}
+            >
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+
+          {/* Messages Container */}
+          <div className="flex-1 flex flex-col">
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto pt-20 pb-4" style={{ height: "calc(100vh - 140px)" }}>
+              {messages.length === 1 ? (
+                // Welcome Screen
+                <div
+                  className="flex items-center justify-center px-8 lg:px-16 py-6 lg:py-8"
+                  style={{ minHeight: "calc(100vh - 200px)" }}
+                >
+                  <div className="text-center max-w-3xl w-full">
+                    <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">
+                      Halo, {user?.username || "Nama"}!
+                    </h2>
+                    <p className="text-gray-600 mb-6 lg:mb-8 text-sm lg:text-base">
+                      Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              // Chat Messages
-              <div className="px-8 lg:px-16 py-6 space-y-4">
-                {messages.slice(1).map((message) => (
-                  <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      {/* Avatar */}
-                      <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
-                        <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            message.role === "user" ? "bg-gray-600" : "bg-[#ff3131]"
-                          }`}
-                        >
-                          {message.role === "user" ? (
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                          ) : (
+              ) : (
+                // Chat Messages
+                <div className="px-8 lg:px-16 py-4 space-y-4">
+                  {messages.slice(1).map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                        {/* Avatar */}
+                        <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              message.role === "user" ? "bg-gray-600" : "bg-[#ff3131]"
+                            }`}
+                          >
+                            {message.role === "user" ? (
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Message Content */}
+                        <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
+                          <div
+                            className={`px-4 py-3 rounded-2xl max-w-full ${
+                              message.role === "user"
+                                ? "bg-[#ff3131] text-white rounded-br-md"
+                                : "bg-white border border-gray-200 text-gray-900 rounded-bl-md shadow-sm"
+                            }`}
+                          >
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                          </div>
+                          <span className="text-xs text-gray-500 mt-1 px-1">{formatTime(message.timestamp)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Loading indicator */}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="flex max-w-[85%]">
+                        <div className="flex-shrink-0 mr-3">
+                          <div className="w-8 h-8 rounded-full bg-[#ff3131] flex items-center justify-center">
                             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
@@ -485,97 +548,66 @@ const Chatbot = ({ user }) => {
                                 d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
                               />
                             </svg>
-                          )}
+                          </div>
                         </div>
-                      </div>
-
-                      {/* Message Content */}
-                      <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
-                        <div
-                          className={`px-4 py-3 rounded-2xl max-w-full ${
-                            message.role === "user"
-                              ? "bg-[#ff3131] text-white rounded-br-md"
-                              : "bg-white border border-gray-200 text-gray-900 rounded-bl-md shadow-sm"
-                          }`}
-                        >
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                        </div>
-                        <span className="text-xs text-gray-500 mt-1 px-1">{formatTime(message.timestamp)}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Loading indicator */}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="flex max-w-[85%]">
-                      <div className="flex-shrink-0 mr-3">
-                        <div className="w-8 h-8 rounded-full bg-[#ff3131] flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
-                        <div className="flex items-center space-x-2">
-                          <LoadingSpinner size="sm" />
-                          <span className="text-sm text-gray-600">AI sedang berpikir...</span>
+                        <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                          <div className="flex items-center space-x-2">
+                            <LoadingSpinner size="sm" />
+                            <span className="text-sm text-gray-600">AI sedang berpikir...</span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </div>
 
-          {/* Input Area */}
-          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-6">
-            <form onSubmit={handleSubmit} className="flex items-end space-x-4">
-              <div className="flex-1 relative">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Ketik di sini"
-                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-base leading-relaxed"
-                  style={{ minHeight: "56px", maxHeight: "120px" }}
-                  disabled={isLoading}
-                />
+            {/* Input Area */}
+            <div
+              className="flex-shrink-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-4"
+              style={{ height: "140px" }}
+            >
+              <form onSubmit={handleSubmit} className="flex items-end space-x-4">
+                <div className="flex-1 relative">
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Ketik di sini"
+                    className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-base leading-relaxed"
+                    style={{ minHeight: "56px", maxHeight: "120px" }}
+                    disabled={isLoading}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+                >
+                  {isLoading ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </form>
+              {/* Helper text */}
+              <div className="mt-3 px-2">
+                <p className="text-sm text-gray-500">
+                  Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
+                </p>
               </div>
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
-              >
-                {isLoading ? (
-                  <LoadingSpinner size="sm" />
-                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    />
-                  </svg>
-                )}
-              </button>
-            </form>
-            {/* Helper text */}
-            <div className="mt-3 px-2">
-              <p className="text-sm text-gray-500">
-                Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
-              </p>
             </div>
           </div>
         </div>
