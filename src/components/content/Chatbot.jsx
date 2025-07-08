@@ -256,22 +256,22 @@ const Chatbot = ({ user }) => {
   )
 
   return (
-    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden">
+    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
       {/* Sidebar */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
-          isSidebarOpen ? "w-1/2 lg:w-80" : "w-0"
+          isSidebarOpen ? "w-full lg:w-3/4" : "w-0"
         } overflow-hidden`}
       >
         {/* Sidebar content */}
         <div className={`pt-16 flex flex-col h-full ${isSidebarOpen ? "block" : "hidden"}`}>
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200">
             {/* Mobile header with close button */}
-            <div className="flex items-center justify-between mb-4 lg:hidden">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#ff3131] rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center justify-between mb-6 lg:hidden">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -281,25 +281,25 @@ const Chatbot = ({ user }) => {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold text-[#ff3131]">Diagnify AI</h1>
-                  <p className="text-sm text-gray-500">Health Assistant</p>
+                  <h1 className="text-xl font-semibold text-[#ff3131]">Diagnify AI</h1>
+                  <p className="text-base text-gray-500">Health Assistant</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
             {/* Desktop header */}
-            <div className="hidden lg:flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#ff3131] rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="hidden lg:flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -309,15 +309,15 @@ const Chatbot = ({ user }) => {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-lg font-semibold text-[#ff3131]">Diagnify AI</h1>
-                  <p className="text-sm text-gray-500">Health Assistant</p>
+                  <h1 className="text-xl font-semibold text-[#ff3131]">Diagnify AI</h1>
+                  <p className="text-base text-gray-500">Health Assistant</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -326,20 +326,20 @@ const Chatbot = ({ user }) => {
             {/* New Chat Button */}
             <button
               onClick={createNewChat}
-              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="w-full flex items-center space-x-4 px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span className="text-sm font-medium">Percakapan Baru</span>
+              <span className="text-base font-medium">Percakapan Baru</span>
             </button>
           </div>
 
           {/* Search */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-6 border-b border-gray-200">
             <div className="relative">
               <svg
-                className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -356,49 +356,49 @@ const Chatbot = ({ user }) => {
                 placeholder="Cari Riwayat Percakapan"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
               />
             </div>
           </div>
 
           {/* Chat History */}
           <div className="flex-1 overflow-y-auto">
-            <div className="p-4">
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Chats</h3>
-              <div className="space-y-1">
+            <div className="p-6">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Chats</h3>
+              <div className="space-y-2">
                 {filteredChats.map((chat) => (
                   <div
                     key={chat.id}
                     onClick={() => {
                       selectChat(chat.id)
                     }}
-                    className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                    className={`group flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors ${
                       currentChatId === chat.id ? "bg-[#ff3131] text-white" : "hover:bg-gray-100"
                     }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium truncate">{chat.title}</h4>
+                      <h4 className="text-base font-medium truncate">{chat.title}</h4>
                       {chat.lastMessage && (
                         <p
-                          className={`text-xs truncate mt-1 ${
+                          className={`text-sm truncate mt-1 ${
                             currentChatId === chat.id ? "text-red-100" : "text-gray-400"
                           }`}
                         >
                           {chat.lastMessage}
                         </p>
                       )}
-                      <p className={`text-xs mt-1 ${currentChatId === chat.id ? "text-red-200" : "text-gray-500"}`}>
+                      <p className={`text-sm mt-1 ${currentChatId === chat.id ? "text-red-200" : "text-gray-500"}`}>
                         {formatDate(chat.timestamp)}
                       </p>
                     </div>
                     {chatHistory.length > 1 && (
                       <button
                         onClick={(e) => deleteChat(chat.id, e)}
-                        className={`opacity-0 group-hover:opacity-100 p-1 rounded transition-all ${
+                        className={`opacity-0 group-hover:opacity-100 p-2 rounded transition-all ${
                           currentChatId === chat.id ? "hover:bg-red-600" : "hover:bg-gray-200"
                         }`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -418,17 +418,29 @@ const Chatbot = ({ user }) => {
 
       {/* Main Content */}
       <div
-        className={`relative flex-1 flex flex-col transition-all duration-300 ${
+        className={`relative flex-1 flex flex-col transition-all duration-300 min-w-0 ${
           isSidebarOpen ? "lg:opacity-100 opacity-80" : "opacity-100"
         }`}
       >
-        {/* Sidebar Toggle Button */}
+        {/* Half-Circle Sidebar Toggle Button */}
         {!isSidebarOpen && (
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-20 left-4 z-30 p-2 bg-[#ff3131] hover:bg-red-600 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            style={{
+              width: "48px",
+              height: "96px",
+              borderTopRightRadius: "48px",
+              borderBottomRightRadius: "48px",
+              borderTopLeftRadius: "0",
+              borderBottomLeftRadius: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: "8px",
+            }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -437,32 +449,34 @@ const Chatbot = ({ user }) => {
         {/* Messages Container */}
         <div className="absolute inset-0 flex flex-col">
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-32">
+          <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-40">
             {messages.length === 1 ? (
               // Welcome Screen
-              <div className="h-full flex items-center justify-center px-20 lg:px-32 py-6 lg:py-8">
-                <div className="text-center max-w-2xl w-full">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Halo, {user?.username || "Nama"}!</h2>
-                  <p className="text-gray-600 mb-6 lg:mb-8 text-sm lg:text-base">
+              <div className="h-full flex items-center justify-center px-8 lg:px-16 py-8 lg:py-12">
+                <div className="text-center max-w-4xl w-full">
+                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6">
+                    Halo, {user?.username || "Nama"}!
+                  </h2>
+                  <p className="text-gray-600 mb-8 lg:mb-12 text-lg lg:text-xl">
                     Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
                   </p>
                 </div>
               </div>
             ) : (
               // Chat Messages
-              <div className="px-16 lg:px-24 py-6 space-y-4">
+              <div className="px-8 lg:px-16 py-8 space-y-6">
                 {messages.slice(1).map((message) => (
                   <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`flex max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                       {/* Avatar */}
-                      <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
+                      <div className={`flex-shrink-0 ${message.role === "user" ? "ml-4" : "mr-4"}`}>
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             message.role === "user" ? "bg-gray-600" : "bg-[#ff3131]"
                           }`}
                         >
                           {message.role === "user" ? (
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -471,7 +485,7 @@ const Chatbot = ({ user }) => {
                               />
                             </svg>
                           ) : (
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
@@ -486,15 +500,15 @@ const Chatbot = ({ user }) => {
                       {/* Message Content */}
                       <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
                         <div
-                          className={`px-4 py-3 rounded-2xl max-w-full ${
+                          className={`px-5 py-4 rounded-2xl max-w-full ${
                             message.role === "user"
                               ? "bg-[#ff3131] text-white rounded-br-md"
                               : "bg-white border border-gray-200 text-gray-900 rounded-bl-md shadow-sm"
                           }`}
                         >
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                          <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
                         </div>
-                        <span className="text-xs text-gray-500 mt-1 px-1">{formatTime(message.timestamp)}</span>
+                        <span className="text-sm text-gray-500 mt-2 px-1">{formatTime(message.timestamp)}</span>
                       </div>
                     </div>
                   </div>
@@ -503,10 +517,10 @@ const Chatbot = ({ user }) => {
                 {/* Loading indicator */}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="flex max-w-[80%]">
-                      <div className="flex-shrink-0 mr-3">
-                        <div className="w-8 h-8 rounded-full bg-[#ff3131] flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex max-w-[85%]">
+                      <div className="flex-shrink-0 mr-4">
+                        <div className="w-10 h-10 rounded-full bg-[#ff3131] flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -516,10 +530,10 @@ const Chatbot = ({ user }) => {
                           </svg>
                         </div>
                       </div>
-                      <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
-                        <div className="flex items-center space-x-2">
+                      <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-5 py-4 shadow-sm">
+                        <div className="flex items-center space-x-3">
                           <LoadingSpinner size="sm" />
-                          <span className="text-sm text-gray-600">AI sedang berpikir...</span>
+                          <span className="text-base text-gray-600">AI sedang berpikir...</span>
                         </div>
                       </div>
                     </div>
@@ -531,9 +545,9 @@ const Chatbot = ({ user }) => {
             )}
           </div>
 
-          {/* Input Area */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-16 lg:px-24 py-4">
-            <form onSubmit={handleSubmit} className="flex items-end space-x-3">
+          {/* Input Area - Made Much Wider */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-6">
+            <form onSubmit={handleSubmit} className="flex items-end space-x-4 max-w-6xl mx-auto">
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
@@ -541,20 +555,20 @@ const Chatbot = ({ user }) => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Ketik di sini"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-sm leading-relaxed"
-                  style={{ minHeight: "48px", maxHeight: "120px" }}
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-base leading-relaxed"
+                  style={{ minHeight: "56px", maxHeight: "140px" }}
                   disabled={isLoading}
                 />
               </div>
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="flex-shrink-0 w-12 h-12 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+                className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
               >
                 {isLoading ? (
                   <LoadingSpinner size="sm" />
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -566,8 +580,8 @@ const Chatbot = ({ user }) => {
               </button>
             </form>
             {/* Helper text */}
-            <div className="mt-2 px-1">
-              <p className="text-xs text-gray-500">
+            <div className="mt-3 px-1 max-w-6xl mx-auto">
+              <p className="text-sm text-gray-500">
                 Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
               </p>
             </div>
