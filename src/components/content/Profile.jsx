@@ -307,7 +307,7 @@ const Profile = ({ user = {} }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="min-h-screen overflow-auto bg-gray-50 relative">
       {/* Success Popup */}
       {showSuccessPopup && (
         <div

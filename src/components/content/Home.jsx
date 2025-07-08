@@ -5,7 +5,7 @@ import LayoutHome from "../layout/layout-home"
 
 const Home = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-auto">
       {/* Hero Section - Full Screen */}
       <main className="pt-16 cursor-default">
         <LayoutHome>

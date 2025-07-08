@@ -10,7 +10,7 @@ const Home = ({ onNavigateToRegister }) => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-auto">
       <Navbar onGetStarted={handleGetStarted} />
 
       {/* Hero Section - Full Screen */}

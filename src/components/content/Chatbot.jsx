@@ -256,7 +256,7 @@ const Chatbot = ({ user }) => {
   )
 
   return (
-    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
+    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-auto max-w-full">
       {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
