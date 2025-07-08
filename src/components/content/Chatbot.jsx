@@ -256,7 +256,7 @@ const Chatbot = ({ user }) => {
   )
 
   return (
-    <div className="h-full bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
+    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
       {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
@@ -353,7 +353,7 @@ const Chatbot = ({ user }) => {
               </svg>
               <input
                 type="text"
-                placeholder="Cari Riwayat Percakapan"
+                placeholder="Cari Riwayat"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
@@ -364,7 +364,7 @@ const Chatbot = ({ user }) => {
           {/* Chat History */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-6">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Chats</h3>
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Riwayat Percakapan</h3>
               <div className="space-y-2">
                 {filteredChats.map((chat) => (
                   <div
