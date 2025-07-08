@@ -579,12 +579,6 @@ const Chatbot = ({ user }) => {
                 )}
               </button>
             </form>
-            {/* Helper text */}
-            <div className="mt-3 px-1 max-w-6xl mx-auto">
-              <p className="text-sm text-gray-500">
-                Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
-              </p>
-            </div>
           </div>
         </div>
       </div>
