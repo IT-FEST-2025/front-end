@@ -256,7 +256,7 @@ const Chatbot = ({ user }) => {
   )
 
   return (
-    <div className="h-[85vh] xl:h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
+    <div className="h-full bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
       {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
@@ -440,9 +440,6 @@ const Chatbot = ({ user }) => {
               paddingLeft: "4px",
             }}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
           </button>
         )}
 
