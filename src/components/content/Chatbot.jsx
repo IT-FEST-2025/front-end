@@ -256,7 +256,7 @@ const Chatbot = ({ user }) => {
   )
 
   return (
-    <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
+    <div className="h-[85vh] xl:h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
       {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
@@ -579,6 +579,12 @@ const Chatbot = ({ user }) => {
                 )}
               </button>
             </form>
+            {/* Helper text */}
+            <div className="mt-3 px-1 max-w-6xl mx-auto">
+              <p className="text-sm text-gray-500">
+                Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
+              </p>
+            </div>
           </div>
         </div>
       </div>
