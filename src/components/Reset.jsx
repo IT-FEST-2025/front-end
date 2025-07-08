@@ -6,7 +6,7 @@ const Reset = () => {
       title="Reset Password"
       welcomeText="Enter your email address and we'll send you a link to reset your password."
     >
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         <div>
           <label htmlFor="sixDigit" className="block text-sm font-medium text-white mb-1">
             Masukkan kode yang didapatkan di email
@@ -20,7 +20,7 @@ const Reset = () => {
             placeholder="Masukkan kode 6 digit"
             onInput={(e) => {
               // Hapus karakter non-digit dan batasi jadi maksimal 6 digit
-              e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+              e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6)
             }}
             className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors text-sm sm:text-base"
           />

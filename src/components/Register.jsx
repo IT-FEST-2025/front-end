@@ -31,28 +31,31 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      });
+      })
 
-      const result = await response.json();
+      const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.message || "Registrasi gagal");
+        throw new Error(result.message || "Registrasi gagal")
       }
 
       if (result.token) {
-        localStorage.setItem("token", result.token);
+        localStorage.setItem("token", result.token)
       }
 
-      localStorage.setItem("user", JSON.stringify({ 
-        username: data.username, 
-        fullName: data.fullName,
-        email: data.email 
-      }));
-      if (onNavigateToLogin) onNavigateToLogin();
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: data.username,
+          fullName: data.fullName,
+          email: data.email,
+        }),
+      )
+      if (onNavigateToLogin) onNavigateToLogin()
     } catch (err) {
-      alert("Gagal registrasi: " + err.message);
+      alert("Gagal registrasi: " + err.message)
     }
-  };
+  }
 
   const handleFormSubmit = async (e) => {
     e.preventDefault()
@@ -69,7 +72,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
 
   return (
     <Layout title="Sign Up" onBack={onNavigateToHome}>
-      <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4" noValidate>
+      <form onSubmit={handleFormSubmit} className="space-y-2 sm:space-y-3" noValidate>
         <FormInput
           id="email"
           name="email"
@@ -119,9 +122,9 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
           autoComplete="name"
           required
         />
-        
+
         {/* Sign In Link */}
-        <div className="text-center py-2">
+        <div className="text-center py-1">
           <p className="cursor-default text-white text-xs sm:text-sm">
             Sudah punya akun?{" "}
             <button
@@ -134,7 +137,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
           </p>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <SubmitButton isLoading={isLoading} loadingText="Creating Account...">
             Sign Up
           </SubmitButton>

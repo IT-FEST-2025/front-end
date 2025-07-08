@@ -1,76 +1,80 @@
-// src/components/Login.jsx
 import { config } from "../config"
-import { useNavigate } from 'react-router-dom';
-import { useForm } from "../hooks/form";
-import { validationRules } from "../utils/validasi";
-import Layout from "./layout/layout"; // Perhatikan path
-import FormInput from "./ui/form-input"; // Perhatikan path
-import SubmitButton from "./ui/submit-button"; // Perhatikan path
+import { useNavigate } from "react-router-dom"
+import { useForm } from "../hooks/form"
+import { validationRules } from "../utils/validasi"
+import Layout from "./layout/layout" // Perhatikan path
+import FormInput from "./ui/form-input" // Perhatikan path
+import SubmitButton from "./ui/submit-button" // Perhatikan path
 
 // Menerima prop onLoginSuccess
 const Login = ({ onLoginSuccess }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const initialValues = {
     username: "",
     password: "",
-  };
+  }
 
   const validation = {
     username: [validationRules.required, validationRules.minLength(1)],
     password: [validationRules.required, validationRules.minLength(1)],
-  };
+  }
 
-  const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation);
+  const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation)
 
   const onSubmit = async (data) => {
     try {
       const response = await fetch(`${config.apiUserService}/api/login`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
-      });
+        body: JSON.stringify(data),
+      })
 
-      const result = await response.json();
+      const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.message || "Login gagal");
+        throw new Error(result.message || "Login gagal")
       }
 
-      localStorage.setItem("token", result.token);
-      localStorage.setItem("user", JSON.stringify({ 
-        username: data.username, 
-        fullName: result.fullName || data.username,
-        email: result.email || ""
-      }));
+      localStorage.setItem("token", result.token)
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          username: data.username,
+          fullName: result.fullName || data.username,
+          email: result.email || "",
+        }),
+      )
       if (onLoginSuccess) {
-        onLoginSuccess();
+        onLoginSuccess()
       }
       // Navigasi ke root path ("/") yang akan ditangani oleh ContentContainer
-      navigate("/beranda");
+      navigate("/beranda")
     } catch (err) {
-      alert("Gagal login: " + err.message);
+      alert("Gagal login: " + err.message)
     }
-  };
+  }
 
   const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    await handleSubmit(onSubmit);
-  };
+    e.preventDefault()
+    await handleSubmit(onSubmit)
+  }
 
   const handleSignUpClick = () => {
-    navigate("/register"); // Arahkan ke halaman register
-  };
+    navigate("/register") // Arahkan ke halaman register
+  }
 
   const handleForgotPasswordClick = () => {
-    navigate("/reset"); // Arahkan ke halaman reset password
-  };
+    navigate("/reset") // Arahkan ke halaman reset password
+  }
 
   return (
-    <Layout title="Sign In" onBack={() => navigate('/')}> {/* Atau sesuaikan onBack */}
-      <form onSubmit={handleFormSubmit} className="space-y-4 sm:space-y-5" noValidate>
+    <Layout title="Sign In" onBack={() => navigate("/")}>
+      {" "}
+      {/* Atau sesuaikan onBack */}
+      <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4" noValidate>
         <FormInput
           id="username"
           name="username"
@@ -106,13 +110,13 @@ const Login = ({ onLoginSuccess }) => {
           </button>
         </div>
 
-        <div className="pt-2">
+        <div className="pt-1">
           <SubmitButton isLoading={isLoading} loadingText="Signing In...">
             Sign In
           </SubmitButton>
         </div>
 
-        <div className="text-center py-2">
+        <div className="text-center py-1">
           <p className="cursor-default text-white text-xs sm:text-sm">
             {"Belum punya akun? "}
             <button
@@ -126,7 +130,7 @@ const Login = ({ onLoginSuccess }) => {
         </div>
       </form>
     </Layout>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

@@ -417,32 +417,38 @@ const Chatbot = ({ user }) => {
       </div>
 
       {/* Main Content */}
-      <div
-        className={`relative flex-1 flex flex-col transition-all duration-300 ${
-          isSidebarOpen ? "lg:opacity-100 opacity-80" : "opacity-100"
-        }`}
-      >
-        {/* Sidebar Toggle Button */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Sidebar Toggle Button - Half Circle */}
         {!isSidebarOpen && (
           <button
             onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-20 left-4 z-30 p-2 bg-[#ff3131] hover:bg-red-600 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            style={{
+              width: "32px",
+              height: "64px",
+              borderTopRightRadius: "32px",
+              borderBottomRightRadius: "32px",
+              borderTopLeftRadius: "0",
+              borderBottomLeftRadius: "0",
+            }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
         )}
 
         {/* Messages Container */}
-        <div className="absolute inset-0 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-32">
+          <div className="flex-1 overflow-y-auto">
             {messages.length === 1 ? (
               // Welcome Screen
-              <div className="h-full flex items-center justify-center px-20 lg:px-32 py-6 lg:py-8">
-                <div className="text-center max-w-2xl w-full">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">Halo, {user?.username || "Nama"}!</h2>
+              <div className="h-full flex items-center justify-center px-8 lg:px-16 py-6 lg:py-8">
+                <div className="text-center max-w-3xl w-full">
+                  <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4">
+                    Halo, {user?.username || "Nama"}!
+                  </h2>
                   <p className="text-gray-600 mb-6 lg:mb-8 text-sm lg:text-base">
                     Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
                   </p>
@@ -450,10 +456,10 @@ const Chatbot = ({ user }) => {
               </div>
             ) : (
               // Chat Messages
-              <div className="px-16 lg:px-24 py-6 space-y-4">
+              <div className="px-8 lg:px-16 py-6 space-y-4">
                 {messages.slice(1).map((message) => (
                   <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`flex max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                       {/* Avatar */}
                       <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
                         <div
@@ -503,7 +509,7 @@ const Chatbot = ({ user }) => {
                 {/* Loading indicator */}
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="flex max-w-[80%]">
+                    <div className="flex max-w-[85%]">
                       <div className="flex-shrink-0 mr-3">
                         <div className="w-8 h-8 rounded-full bg-[#ff3131] flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -532,8 +538,8 @@ const Chatbot = ({ user }) => {
           </div>
 
           {/* Input Area */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-16 lg:px-24 py-4">
-            <form onSubmit={handleSubmit} className="flex items-end space-x-3">
+          <div className="flex-shrink-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-6">
+            <form onSubmit={handleSubmit} className="flex items-end space-x-4">
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}
@@ -541,20 +547,20 @@ const Chatbot = ({ user }) => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Ketik di sini"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-sm leading-relaxed"
-                  style={{ minHeight: "48px", maxHeight: "120px" }}
+                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-base leading-relaxed"
+                  style={{ minHeight: "56px", maxHeight: "120px" }}
                   disabled={isLoading}
                 />
               </div>
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="flex-shrink-0 w-12 h-12 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+                className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
               >
                 {isLoading ? (
                   <LoadingSpinner size="sm" />
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -566,8 +572,8 @@ const Chatbot = ({ user }) => {
               </button>
             </form>
             {/* Helper text */}
-            <div className="mt-2 px-1">
-              <p className="text-xs text-gray-500">
+            <div className="mt-3 px-2">
+              <p className="text-sm text-gray-500">
                 Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
               </p>
             </div>

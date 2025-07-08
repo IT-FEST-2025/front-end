@@ -52,7 +52,7 @@ const Home = ({ onNavigateToRegister }) => {
               <Animated delay={400}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-24 max-w-4xl mx-auto">
                   <div className="text-center">
-                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 hover:shadow-[0_0_40px_#b81414] hover:scale-120 duration-300">
+                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_40px_#ff3131] hover:shadow-[0_0_70px_#ff3131] hover:scale-120 duration-300">
                       <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
@@ -66,7 +66,7 @@ const Home = ({ onNavigateToRegister }) => {
                   </div>
 
                   <div className="text-center">
-                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 hover:shadow-[0_0_40px_#b81414] hover:scale-120 duration-300">
+                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_40px_#ff3131] hover:shadow-[0_0_70px_#ff3131] hover:scale-120 duration-300">
                       <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
@@ -80,7 +80,7 @@ const Home = ({ onNavigateToRegister }) => {
                   </div>
 
                   <div className="text-center">
-                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 hover:shadow-[0_0_40px_#b81414] hover:scale-120 duration-300">
+                    <div className="w-18 h-18 bg-[#ff3131] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_40px_#ff3131] hover:shadow-[0_0_70px_#ff3131] hover:scale-120 duration-300">
                       <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
                           strokeLinecap="round"
@@ -114,7 +114,7 @@ const Home = ({ onNavigateToRegister }) => {
               {/* AI Symptom Checker */}
               <Animated delay={100} animation="translate-y-12 opacity-0 scale-95">
                 <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
-                  <div className="w-16 h-16 bg-[#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
@@ -167,7 +167,7 @@ const Home = ({ onNavigateToRegister }) => {
               {/* Chatbot Konsultasi */}
               <Animated delay={200} animation="translate-y-12 opacity-0 scale-95">
                 <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
-                  <div className="w-16 h-16 bg-[#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
@@ -220,7 +220,7 @@ const Home = ({ onNavigateToRegister }) => {
               {/* Health Tracker */}
               <Animated delay={300} animation="translate-y-12 opacity-0 scale-95">
                 <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
-                  <div className="w-16 h-16 bg-[#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
