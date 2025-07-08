@@ -257,10 +257,10 @@ const Chatbot = ({ user }) => {
 
   return (
     <div className="h-screen bg-white flex flex-col lg:flex-row overflow-hidden max-w-full">
-      {/* Sidebar */}
+      {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
-          isSidebarOpen ? "w-full lg:w-3/4" : "w-0"
+          isSidebarOpen ? "w-3/4 lg:w-1/4" : "w-0"
         } overflow-hidden`}
       >
         {/* Sidebar content */}
@@ -287,9 +287,9 @@ const Chatbot = ({ user }) => {
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -315,9 +315,9 @@ const Chatbot = ({ user }) => {
               </div>
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -422,25 +422,25 @@ const Chatbot = ({ user }) => {
           isSidebarOpen ? "lg:opacity-100 opacity-80" : "opacity-100"
         }`}
       >
-        {/* Half-Circle Sidebar Toggle Button */}
+        {/* Smaller Half-Circle Sidebar Toggle Button */}
         {!isSidebarOpen && (
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
             style={{
-              width: "48px",
-              height: "96px",
-              borderTopRightRadius: "48px",
-              borderBottomRightRadius: "48px",
+              width: "32px",
+              height: "64px",
+              borderTopRightRadius: "32px",
+              borderBottomRightRadius: "32px",
               borderTopLeftRadius: "0",
               borderBottomLeftRadius: "0",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              paddingLeft: "8px",
+              paddingLeft: "4px",
             }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
