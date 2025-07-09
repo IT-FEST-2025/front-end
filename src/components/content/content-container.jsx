@@ -8,8 +8,8 @@ import Symptom from "./Symptom"
 import Chatbot from "./Chatbot"
 import HealthTrack from "./Health-track"
 import Profile from "./Profile"
-import Login from "./Login" // Import Login component
-import Register from "./Register" // Import Register component
+import Login from "../Login" // Import Login component
+import Register from "../Register" // Import Register component
 
 const ContentContainer = ({ onLogout }) => {
   const navigate = useNavigate()
