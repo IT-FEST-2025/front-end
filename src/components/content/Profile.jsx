@@ -140,13 +140,28 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     // Upload to server
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch(`${config.apiUserService}/api/photoprofile`, { // Corrected API endpoint
+      function dataURLtoBlob(dataurl) {
+        const arr = dataurl.split(",")
+        const mime = arr[0].match(/:(.*?);/)[1]
+        const bstr = atob(arr[1])
+        let n = bstr.length
+        const u8arr = new Uint8Array(n)
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n)
+        }
+        return new Blob([u8arr], { type: mime })
+      }
+
+      const blob = dataURLtoBlob(croppedImage)
+      const formData = new FormData()
+      formData.append("image", blob, "profile.jpg") // 'image' = nama field
+
+      const res = await fetch(`${config.apiUserService}/api/photoprofile`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`  
         },
-        body: JSON.stringify({ imageBase64: croppedImage })
+        body: formData
       })
 
       const result = await res.json()

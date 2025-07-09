@@ -1,6 +1,7 @@
 // menggabungkan home, symptom, health track, chatbot, profil jadi satu wadah
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { config } from "../../config"
 import Navbar from "./Navbar"
 import Home from "./Home"
 import Symptom from "./Symptom"
@@ -31,7 +32,7 @@ const ContentContainer = ({ onLogout }) => {
 
     if (token) {
       // Fetch user basic data
-      fetch("https://api.ayuwoki.my.id/users/api/me", {
+      fetch(`${config.apiUserService}/users/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -46,7 +47,7 @@ const ContentContainer = ({ onLogout }) => {
               profilePicture: "", // Initialize profilePicture
             }
             // Fetch profile picture
-            fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
+            fetch(`${config.apiUserService}/users/api/photoprofile`, {
               method: "GET", // Specify GET method explicitly
               headers: {
                 Authorization: `Bearer ${token}`,
