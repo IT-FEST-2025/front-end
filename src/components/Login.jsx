@@ -42,9 +42,10 @@ const Login = ({ onLoginSuccess }) => {
       localStorage.setItem(
         "user",
         JSON.stringify({
-          username: data.username,
-          fullName: result.fullName || data.username,
-          email: result.email || "",
+          username: result.username || data.username,
+          fullName: result.fullName || data.fullName || data.username,
+          email: result.email || data.email || "",
+          profilePicture: result.profilePicture || "",
         }),
       )
       if (onLoginSuccess) {

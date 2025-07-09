@@ -240,11 +240,13 @@ const Chatbot = ({ user }) => {
     if (chatHistory.length === 1) return
 
     setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId))
-
     if (currentChatId === chatId) {
       const remainingChats = chatHistory.filter((chat) => chat.id !== chatId)
       if (remainingChats.length > 0) {
         selectChat(remainingChats[0].id)
+      } else {
+        // If no chats left, create a new empty chat
+        createNewChat();
       }
     }
   }
@@ -254,6 +256,8 @@ const Chatbot = ({ user }) => {
       chat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
   )
+
+  const userProfilePicture = user?.profilePicture || "/default-avatar.jpg";
 
   return (
     <div className="h-screen bg-white flex flex-col lg:flex-row overflow-auto max-w-full">
@@ -272,12 +276,7 @@ const Chatbot = ({ user }) => {
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
                 <div>
@@ -287,59 +286,46 @@ const Chatbot = ({ user }) => {
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="text-gray-500 hover:text-gray-700 transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-
-            {/* Desktop header */}
-            <div className="hidden lg:flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h1 className="text-xl font-semibold text-[#ff3131]">Diagnify AI</h1>
-                  <p className="text-base text-gray-500">Health Assistant</p>
-                </div>
+            {/* Desktop header (always visible on larger screens) */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
               </div>
-              <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div>
+                <h1 className="text-xl font-semibold text-[#ff3131]">Diagnify AI</h1>
+                <p className="text-base text-gray-500">Health Assistant</p>
+              </div>
             </div>
-
-            {/* New Chat Button */}
-            <button
-              onClick={createNewChat}
-              className="w-full flex items-center space-x-4 px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="text-base font-medium">Percakapan Baru</span>
-            </button>
-          </div>
-
-          {/* Search */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="relative">
+            {/* Search */}
+            <div className="mt-6 relative">
+              <input
+                type="text"
+                placeholder="Cari percakapan..."
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff3131] focus:border-transparent text-gray-700"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <svg
-                className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -351,238 +337,192 @@ const Chatbot = ({ user }) => {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <input
-                type="text"
-                placeholder="Cari Riwayat"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
-              />
             </div>
+            {/* New Chat Button */}
+            <button
+              onClick={createNewChat}
+              className="mt-6 w-full bg-[#ff3131] hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span>Buat Chat Baru</span>
+            </button>
           </div>
 
           {/* Chat History */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-6">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Riwayat Percakapan</h3>
-              <div className="space-y-2">
-                {filteredChats.map((chat) => (
-                  <div
-                    key={chat.id}
-                    onClick={() => {
-                      selectChat(chat.id)
-                    }}
-                    className={`group flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors ${
-                      currentChatId === chat.id ? "bg-[#ff3131] text-white" : "hover:bg-gray-100"
-                    }`}
-                  >
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-base font-medium truncate">{chat.title}</h4>
-                      {chat.lastMessage && (
-                        <p
-                          className={`text-sm truncate mt-1 ${
-                            currentChatId === chat.id ? "text-red-100" : "text-gray-400"
-                          }`}
-                        >
-                          {chat.lastMessage}
-                        </p>
-                      )}
-                      <p className={`text-sm mt-1 ${currentChatId === chat.id ? "text-red-200" : "text-gray-500"}`}>
-                        {formatDate(chat.timestamp)}
-                      </p>
-                    </div>
-                    {chatHistory.length > 1 && (
-                      <button
-                        onClick={(e) => deleteChat(chat.id, e)}
-                        className={`opacity-0 group-hover:opacity-100 p-2 rounded transition-all ${
-                          currentChatId === chat.id ? "hover:bg-red-600" : "hover:bg-gray-200"
-                        }`}
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
-                    )}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {filteredChats.length > 0 ? (
+              filteredChats.map((chat) => (
+                <div
+                  key={chat.id}
+                  onClick={() => selectChat(chat.id)}
+                  className={`flex items-center justify-between p-4 rounded-lg cursor-pointer transition-colors duration-200 group relative ${
+                    currentChatId === chat.id
+                      ? "bg-red-50 border-l-4 border-[#ff3131] text-[#ff3131] font-semibold"
+                      : "bg-white hover:bg-gray-100 border-l-4 border-transparent text-gray-700"
+                  }`}
+                >
+                  <div>
+                    <h3 className="text-sm line-clamp-1">{chat.title}</h3>
+                    <p className="text-xs text-gray-500 line-clamp-1 mt-1">
+                      {chat.lastMessage || "Mulai percakapan..."}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {formatDate(chat.timestamp)} - {formatTime(chat.timestamp)}
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
+                  {chatHistory.length > 1 && ( // Only show delete if more than one chat
+                    <button
+                      onClick={(e) => deleteChat(chat.id, e)}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-full bg-gray-200 text-gray-500 hover:bg-red-200 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      title="Hapus Chat"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">Tidak ada percakapan ditemukan.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div
-        className={`relative flex-1 flex flex-col transition-all duration-300 min-w-0 ${
-          isSidebarOpen ? "lg:opacity-100 opacity-80" : "opacity-100"
-        }`}
-      >
-        {/* Smaller Half-Circle Sidebar Toggle Button */}
-        {!isSidebarOpen && (
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col bg-gray-50 relative">
+        {/* Navbar Toggle for Mobile */}
+        <div className="lg:hidden fixed top-0 left-0 w-full bg-white border-b border-gray-200 flex items-center h-16 px-4 z-30 shadow-sm">
           <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            style={{
-              width: "32px",
-              height: "64px",
-              borderTopRightRadius: "32px",
-              borderBottomRightRadius: "32px",
-              borderTopLeftRadius: "0",
-              borderBottomLeftRadius: "0",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: "4px",
-            }}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-gray-600 hover:text-gray-900 focus:outline-none"
           >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
+            </svg>
           </button>
-        )}
+          <span className="ml-4 text-lg font-semibold text-gray-800">Chatbot AI</span>
+        </div>
 
-        {/* Messages Container */}
-        <div className="absolute inset-0 flex flex-col">
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-40">
-            {messages.length === 1 ? (
-              // Welcome Screen
-              <div className="h-full flex items-center justify-center px-8 lg:px-16 py-8 lg:py-12">
-                <div className="text-center max-w-4xl w-full">
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6">
-                    Halo, {user?.username || "Nama"}!
-                  </h2>
-                  <p className="text-gray-600 mb-8 lg:mb-12 text-lg lg:text-xl">
-                    Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
-                  </p>
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 pt-20 lg:pt-6">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex items-start ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {message.role === "assistant" && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#ff3131] flex items-center justify-center text-white text-lg font-bold mr-3">
+                  AI
                 </div>
-              </div>
-            ) : (
-              // Chat Messages
-              <div className="px-8 lg:px-16 py-8 space-y-6">
-                {messages.slice(1).map((message) => (
-                  <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      {/* Avatar */}
-                      <div className={`flex-shrink-0 ${message.role === "user" ? "ml-4" : "mr-4"}`}>
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            message.role === "user" ? "bg-gray-600" : "bg-[#ff3131]"
-                          }`}
-                        >
-                          {message.role === "user" ? (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                          ) : (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Message Content */}
-                      <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
-                        <div
-                          className={`px-5 py-4 rounded-2xl max-w-full ${
-                            message.role === "user"
-                              ? "bg-[#ff3131] text-white rounded-br-md"
-                              : "bg-white border border-gray-200 text-gray-900 rounded-bl-md shadow-sm"
-                          }`}
-                        >
-                          <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                        </div>
-                        <span className="text-sm text-gray-500 mt-2 px-1">{formatTime(message.timestamp)}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Loading indicator */}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="flex max-w-[85%]">
-                      <div className="flex-shrink-0 mr-4">
-                        <div className="w-10 h-10 rounded-full bg-[#ff3131] flex items-center justify-center">
-                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-md px-5 py-4 shadow-sm">
-                        <div className="flex items-center space-x-3">
-                          <LoadingSpinner size="sm" />
-                          <span className="text-base text-gray-600">AI sedang berpikir...</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
-
-          {/* Input Area - Made Much Wider */}
-          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-6">
-            <form onSubmit={handleSubmit} className="flex items-end space-x-4 max-w-6xl mx-auto">
-              <div className="flex-1 relative">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder="Ketik di sini"
-                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] resize-none transition-colors text-base leading-relaxed"
-                  style={{ minHeight: "56px", maxHeight: "140px" }}
-                  disabled={isLoading}
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+              )}
+              {message.role === "user" && (
+                <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden mr-3">
+                  <img src={userProfilePicture} alt="User Avatar" className="w-full h-full object-cover"/>
+                </div>
+              )}
+              <div
+                className={`max-w-[70%] p-3 rounded-lg shadow-sm ${
+                  message.role === "user"
+                    ? "bg-[#ff3131] text-white rounded-br-none"
+                    : "bg-gray-200 text-gray-800 rounded-bl-none"
+                }`}
               >
-                {isLoading ? (
-                  <LoadingSpinner size="sm" />
-                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                    />
-                  </svg>
-                )}
-              </button>
-            </form>
-            {/* Helper text */}
-            <div className="mt-3 px-1 max-w-6xl mx-auto">
-              <p className="text-sm text-gray-500">
-                Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
-              </p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {message.content}
+                </p>
+                <span
+                  className={`block text-right mt-1 ${
+                    message.role === "user" ? "text-white text-opacity-80" : "text-gray-500"
+                  } text-xs`}
+                >
+                  {formatTime(message.timestamp)}
+                </span>
+              </div>
+              {/* If user message, photo is on the left; otherwise, it's assistant, photo is on the right. */}
+              {/* The current implementation puts user photo on the left. Let's keep it this way. */}
             </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Chat Input */}
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 bg-white border-t border-gray-200 flex items-end space-x-3 sticky bottom-0 left-0 right-0 z-20"
+        >
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ketik pesan Anda..."
+              rows={1}
+              className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#ff3131] focus:border-transparent resize-none transition-colors text-base leading-relaxed"
+              style={{ minHeight: "56px", maxHeight: "140px" }}
+              disabled={isLoading}
+            />
           </div>
+          <button
+            type="submit"
+            disabled={!input.trim() || isLoading}
+            className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+          >
+            {isLoading ? (
+              <LoadingSpinner size="sm" />
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
+            )}
+          </button>
+        </form>
+        {/* Helper text */}
+        <div className="mt-3 px-1 max-w-6xl mx-auto">
+          <p className="text-sm text-gray-500">
+            Tekan Enter untuk mengirim pesan, Shift + Enter untuk baris baru.
+          </p>
         </div>
       </div>
     </div>

@@ -46,9 +46,10 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
       localStorage.setItem(
         "user",
         JSON.stringify({
-          username: data.username,
-          fullName: data.fullName,
-          email: data.email,
+          username: result.username || data.username,
+          fullName: result.fullName || data.fullName,
+          email: result.email || data.email,
+          profilePicture: result.profilePicture || "",
         }),
       )
       if (onNavigateToLogin) onNavigateToLogin()

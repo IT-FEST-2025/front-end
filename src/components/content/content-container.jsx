@@ -7,64 +7,94 @@ import Symptom from "./Symptom"
 import Chatbot from "./Chatbot"
 import HealthTrack from "./Health-track"
 import Profile from "./Profile"
-import { config } from "../../config"
+import Login from "./Login" // Import Login component
+import Register from "./Register" // Import Register component
 
 const ContentContainer = ({ onLogout }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState(null)
 
+  // Function to update user state from child components
+  const handleUserUpdate = (updatedUserData) => {
+    setUser(updatedUserData)
+    localStorage.setItem("user", JSON.stringify(updatedUserData))
+  }
+
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token")
+    const storedUser = localStorage.getItem("user")
+
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      const token = localStorage.getItem("token");
-      if (token) {
-        fetch(`${config.apiUserService}/api/user`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => response.json())
-          .then((result) => {
-            if (result.username && result.email) {
-              const userData = { username: result.username, fullName: result.fullName, email: result.email };
-              setUser(userData);
-              localStorage.setItem("user", JSON.stringify(userData));
-            } else {
-              navigate("/login");
+      setUser(JSON.parse(storedUser))
+    }
+
+    if (token) {
+      // Fetch user basic data
+      fetch("https://api.ayuwoki.my.id/users/api/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.username && data.email) {
+            const userData = {
+              username: data.username,
+              fullName: data.fullName,
+              email: data.email,
+              profilePicture: "", // Initialize profilePicture
             }
-          })
-          .catch(() => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-            navigate("/login");
-          });
-      } else {
-        navigate("/login");
-      }
+            // Fetch profile picture
+            fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
+              method: "GET", // Specify GET method explicitly
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            })
+              .then((photoRes) => photoRes.json())
+              .then((photoData) => {
+                if (photoData.profilePictureUrl) {
+                  userData.profilePicture = photoData.profilePictureUrl
+                }
+                setUser(userData)
+                localStorage.setItem("user", JSON.stringify(userData))
+              })
+              .catch((photoError) => {
+                console.error("Error fetching profile photo:", photoError)
+                setUser(userData) // Still set user data even if photo fetch fails
+                localStorage.setItem("user", JSON.stringify(userData))
+              })
+          } else {
+            navigate("/login")
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error)
+          localStorage.removeItem("token")
+          localStorage.removeItem("user")
+          navigate("/login")
+        })
+    } else {
+      navigate("/login")
     }
   }, [navigate])
 
-  // Fungsi untuk navigasi dari Navbar
   const handleNavigation = (page) => {
-    const targetPath = page === "home" ? "/beranda" : `/${page}`;
-    navigate(targetPath);
+    const targetPath = page === "home" ? "/beranda" : `/${page}`
+    navigate(targetPath)
   }
 
-  // Fungsi untuk logout
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
-    navigate("/");
-  };
+    if (onLogout) onLogout()
+    localStorage.removeItem("token") // Ensure token is removed
+    localStorage.removeItem("user") // Ensure user data is removed
+    setUser(null) // Clear user state
+    navigate("/")
+  }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar selalu tampil */}
       <Navbar
         user={user}
         currentPage={
@@ -76,14 +106,19 @@ const ContentContainer = ({ onLogout }) => {
         onLogout={handleLogout}
       />
 
-      {/* Konten halaman sesuai URL */}
       <Routes>
         <Route path="/beranda" element={<Home />} />
         <Route path="/symptom" element={<Symptom />} />
         <Route path="/chatbot" element={<Chatbot user={user} />} />
         <Route path="/health-tracker" element={<HealthTrack />} />
-        <Route path="/profile" element={<Profile user={user} />} />
-        <Route path="*" element={<Home />} />
+        {/* Pass handleUserUpdate to Profile component */}
+        <Route
+          path="/profile"
+          element={<Profile user={user} onUserUpdate={handleUserUpdate} />}
+        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Home />} /> {/* Fallback route */}
       </Routes>
     </div>
   )
