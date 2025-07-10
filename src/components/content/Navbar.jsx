@@ -174,16 +174,13 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                     <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Beranda </span>
                   </button>
                   <button onClick={(e) => handleNavClick("symptom", e)} className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-4 group ${ currentPage === "symptom" ? "font-bold text-[#ff3131] border-[#ff3131] bg-red-50" : "text-gray-700 border-transparent hover:bg-gray-100 hover:border-[#ff3131] hover:text-[#ff3131]" }`} >
-                    <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Diagnosa Gejala </span>
+                    <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> AI Symptom </span>
                   </button>
                   <button onClick={(e) => handleNavClick("chatbot", e)} className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-4 group ${ currentPage === "chatbot" ? "font-bold text-[#ff3131] border-[#ff3131] bg-red-50" : "text-gray-700 border-transparent hover:bg-gray-100 hover:border-[#ff3131] hover:text-[#ff3131]" }`} >
-                    <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Chatbot AI </span>
+                    <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Chatbot </span>
                   </button>
                   <button onClick={(e) => handleNavClick("health-tracker", e)} className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-4 group ${ currentPage === "health-tracker" ? "font-bold text-[#ff3131] border-[#ff3131] bg-red-50" : "text-gray-700 border-transparent hover:bg-gray-100 hover:border-[#ff3131] hover:text-[#ff3131]" }`} >
                     <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Health Tracker </span>
-                  </button>
-                  <button onClick={(e) => handleNavClick("profile", e)} className={`block w-full text-left px-4 py-2 text-sm transition-all duration-200 border-l-4 group ${ currentPage === "profile" ? "font-bold text-[#ff3131] border-[#ff3131] bg-red-50" : "text-gray-700 border-transparent hover:bg-gray-100 hover:border-[#ff3131] hover:text-[#ff3131]" }`} >
-                    <span className="transition-transform duration-200 group-hover:translate-x-1 inline-block"> Profil </span>
                   </button>
                 </div>
               )}

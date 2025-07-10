@@ -32,7 +32,7 @@ const ContentContainer = ({ onLogout }) => {
 
     if (token) {
       // Fetch user basic data
-      fetch(`${config.apiUserService}/users/api/me`, {
+      fetch(`${config.apiUserService}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
