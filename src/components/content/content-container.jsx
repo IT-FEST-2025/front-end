@@ -117,10 +117,6 @@ const ContentContainer = ({ onLogout }) => {
           path="/profile"
           element={<Profile user={user} onUserUpdate={handleUserUpdate} />}
         />
-        <Route path="/login" element={<Login onLoginSuccess={() =>
-          navigate("/beranda")} />}
-        />
-        <Route path="/register" element={<Register />} />
         <Route path="*" element={<Home />} /> {/* Fallback route */}
       </Routes>
     </div>
