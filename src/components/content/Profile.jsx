@@ -43,7 +43,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       if (!token) return
 
       try {
-        const response = await fetch(`${config.apiUserService}/api/update/profile`, {
+        const response = await fetch(`${config.apiUserService}/api/me`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         const result = await response.json()
 
         if (response.ok && result.data) {
-          // Update formData with fetched profile data
+          console.log(result.data)
           setFormData((prev) => ({
             ...prev,
             gender: result.data.gender || "",
@@ -763,7 +763,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
               </div>
               <div>
                 <label
-                  htmlF
+                  htmlFor
                   ="weight"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >

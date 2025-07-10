@@ -38,7 +38,7 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(result.message || "Login gagal")
       }
 
-      localStorage.setItem("token", result.accessToken)
+      localStorage.setItem("token", result.data.accessToken)
       if (onLoginSuccess) {
         onLoginSuccess()
       }
