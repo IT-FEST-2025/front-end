@@ -38,16 +38,7 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(result.message || "Login gagal")
       }
 
-      localStorage.setItem("token", result.token)
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          username: result.username || data.username,
-          fullName: result.fullName || data.fullName || data.username,
-          email: result.email || data.email || "",
-          profilePicture: result.profilePicture || "",
-        }),
-      )
+      localStorage.setItem("token", result.accessToken)
       if (onLoginSuccess) {
         onLoginSuccess()
       }
