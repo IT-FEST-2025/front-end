@@ -67,17 +67,17 @@ const ContentContainer = ({ onLogout }) => {
                 localStorage.setItem("user", JSON.stringify(userData))
               })
           } else {
-            navigate("/login")
+            navigate("/beranda") // sementara
           }
         })
         .catch((error) => {
           console.error("Error fetching user data:", error)
           localStorage.removeItem("token")
           localStorage.removeItem("user")
-          navigate("/login")
+          navigate("/beranda") // sementara
         })
     } else {
-      navigate("/login")
+      navigate("/beranda") // sementara
     }
   }, [navigate])
 
