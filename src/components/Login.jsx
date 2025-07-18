@@ -2,11 +2,10 @@ import { config } from "../config"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
-import Layout from "./layout/layout" // Perhatikan path
-import FormInput from "./ui/form-input" // Perhatikan path
-import SubmitButton from "./ui/submit-button" // Perhatikan path
+import Layout from "./layout/layout"
+import FormInput from "./ui/form-input"
+import SubmitButton from "./ui/submit-button"
 
-// Menerima prop onLoginSuccess
 const Login = ({ onLoginSuccess }) => {
   const navigate = useNavigate()
 
@@ -38,12 +37,13 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(result.message || "Login gagal")
       }
 
-      localStorage.setItem("token", result.data.accessToken)
+      localStorage.setItem("accessToken", result.data.accessToken)
+
+      // Call the callback to update authentication state
+      // Don't navigate manually, let App.jsx handle the routing change
       if (onLoginSuccess) {
         onLoginSuccess()
       }
-      // Navigasi ke root path ("/") yang akan ditangani oleh ContentContainer
-      navigate("/beranda")
     } catch (err) {
       alert("Gagal login: " + err.message)
     }
@@ -55,17 +55,15 @@ const Login = ({ onLoginSuccess }) => {
   }
 
   const handleSignUpClick = () => {
-    navigate("/register") // Arahkan ke halaman register
+    navigate("/register")
   }
 
   const handleForgotPasswordClick = () => {
-    navigate("/reset") // Arahkan ke halaman reset password
+    navigate("/reset")
   }
 
   return (
     <Layout title="Sign In" onBack={() => navigate("/")}>
-      {" "}
-      {/* Atau sesuaikan onBack */}
       <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4" noValidate>
         <FormInput
           id="username"

@@ -6,6 +6,7 @@ import LayoutHome from "../layout/layout-home"
 const Home = () => {
   return (
     <div className="min-h-screen overflow-auto">
+
       {/* Hero Section - Full Screen */}
       <main className="pt-16 cursor-default">
         <LayoutHome>
@@ -14,10 +15,10 @@ const Home = () => {
               <div className="text-center">
                 {/* Main Heading */}
                 <Animated delay={200}>
-                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white drop-shadow-md mb-8 tracking-tight">
+                  <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white drop-shadow-md mb-6 tracking-tight">
                     Diagnify
                   </h1>
-                  <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-6xl mx-auto leading-relaxed">
+                  <p className="text-lg sm:text-xl lg:text-2xl text-white/90 max-w-5xl mx-auto mb-6 leading-relaxed">
                     Asisten kesehatan pintar Anda yang didukung oleh AI. Mendiagnosis gejala, berkonsultasi secara instan, dan melacak kesehatan Anda dengan cepat.
                   </p>
                 </Animated>
@@ -84,17 +85,17 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Animated>
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Fitur utama kami</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Fitur Utama Kami</h2>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                   Jelajahi fitur kami yang dirancang untuk membantu Anda memantau dan memahami kesehatan Anda dengan lebih baik.
                 </p>
               </div>
             </Animated>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
               {/* AI Symptom Checker */}
               <Animated delay={100} animation="translate-y-12 opacity-0 scale-95">
-                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2 h-full flex flex-col">
+                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
                   <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -105,63 +106,49 @@ const Home = () => {
                       />
                     </svg>
                   </div>
-                  <div className="flex-grow flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">AI Symptom Checker</h3>
-                    <p className="text-gray-600 text-center mb-6 flex-grow">
-                      Advanced AI technology analyzes your symptoms and provides preliminary health assessments with
-                      high accuracy and reliability.
-                    </p>
-                    <ul className="space-y-2 text-sm text-gray-600 mt-auto">
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Instant symptom analysis
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        95% accuracy rate
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Real-time health insights
-                      </li>
-                    </ul>
-                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">AI Symptom Checker</h3>
+                  <p className="text-gray-600 text-center mb-6">
+                    Advanced AI technology analyzes your symptoms and provides preliminary health assessments with high
+                    accuracy and reliability.
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Instant symptom analysis
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      95% accuracy rate
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Personalized recommendations
+                    </li>
+                  </ul>
                 </div>
               </Animated>
 
-              {/* Instant Health Consultations */}
+              {/* Chatbot Konsultasi */}
               <Animated delay={200} animation="translate-y-12 opacity-0 scale-95">
-                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2 h-full flex flex-col">
+                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
                   <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -172,63 +159,49 @@ const Home = () => {
                       />
                     </svg>
                   </div>
-                  <div className="flex-grow flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Chatbot Konsultasi</h3>
-                    <p className="text-gray-600 text-center mb-6 flex-grow">
-                      Chat with our AI health assistant for personalized advice and answers to your health-related
-                      questions anytime, anywhere.
-                    </p>
-                    <ul className="space-y-2 text-sm text-gray-600 mt-auto">
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        24/7 AI availability
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Personalized health advice
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Access to health resources
-                      </li>
-                    </ul>
-                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Chatbot Konsultasi</h3>
+                  <p className="text-gray-600 text-center mb-6">
+                    Interactive AI chatbot provides 24/7 health consultation, answers medical questions, and guides you
+                    through health concerns.
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      24/7 availability
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Multilingual support
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Expert-backed responses
+                    </li>
+                  </ul>
                 </div>
               </Animated>
 
-              {/* Health Tracking & Monitoring */}
+              {/* Health Tracker */}
               <Animated delay={300} animation="translate-y-12 opacity-0 scale-95">
-                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2 h-full flex flex-col">
+                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
                   <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -239,64 +212,49 @@ const Home = () => {
                       />
                     </svg>
                   </div>
-                  <div className="flex-grow flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Health Tracker</h3>
-                    <p className="text-gray-600 text-center mb-6 flex-grow">
-                      Monitor your health metrics, track progress over time, and receive personalized recommendations to
-                      maintain a healthy lifestyle.
-                    </p>
-                    <ul className="space-y-2 text-sm text-gray-600 mt-auto">
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Personalized health dashboards
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Vital signs monitoring
-                      </li>
-                      <li className="flex items-center">
-                        <svg
-                          className="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Progress analytics
-                      </li>
-                    </ul>
-                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Health Tracker</h3>
+                  <p className="text-gray-600 text-center mb-6">
+                    Comprehensive health monitoring system tracks vital signs, symptoms, medications, and provides
+                    detailed health analytics.
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Vital signs monitoring
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Progress analytics
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Medication reminders
+                    </li>
+                  </ul>
                 </div>
               </Animated>
             </div>
           </div>
         </div>
       </main>
-
       {/* Footer */}
       <footer className="bg-[#ff3131] text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
