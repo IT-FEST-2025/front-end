@@ -415,8 +415,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(filteredUpdateFields),
+        body: JSON.stringify({updateFields : filteredUpdateFields}),
       })
+
+      console.log({updateFields : filteredUpdateFields})
 
       const result = await response.json()
 
@@ -726,8 +728,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="laki-laki"
-                    checked={formData.gender === "laki-laki"}
+                    value="pria"
+                    checked={formData.gender === "pria"}
                     onChange={handleInputChange}
                     className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
                   />
@@ -737,8 +739,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="perempuan"
-                    checked={formData.gender === "perempuan"}
+                    value="wanita"
+                    checked={formData.gender === "wanita"}
                     onChange={handleInputChange}
                     className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
                   />
