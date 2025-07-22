@@ -385,18 +385,18 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       }
 
       const updateFields = {
-        age: formData.age !== "" ? Number.parseInt(formData.age) : undefined,
-        gender: formData.gender !== "" ? formData.gender : undefined,
-        height_cm: formData.height !== "" ? Number.parseInt(formData.height) : undefined,
-        weight_kg: formData.weight !== "" ? Number.parseInt(formData.weight) : undefined,
+        age: formData.age !== "" ? Number.parseInt(formData.age) : null,
+        gender: formData.gender !== "" ? formData.gender : null,
+        height_cm: formData.height !== "" ? Number.parseInt(formData.height) : null,
+        weight_kg: formData.weight !== "" ? Number.parseInt(formData.weight) : null,
         smoking_status: formData.isActiveSmoker === "Ya" ? "aktif" : "tidak aktif",
         chronic_diseases: formData.medicalHistory
           .split(",")
           .map((item) => item.trim())
           .filter((item) => item !== ""),
-        fullName: formData.fullName !== user?.fullName ? formData.fullName : undefined, // Hanya kirim jika berubah
-        email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
-        username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
+        full_name: formData.fullName !== user?.fullName ? formData.fullName : null, // Hanya kirim jika berubah
+        // email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
+        // username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
       }
 
       // Filter nilai undefined untuk hanya mengirim bidang yang berubah
@@ -415,8 +415,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(filteredUpdateFields),
+        body: JSON.stringify({updateFields : filteredUpdateFields}),
       })
+
+      console.log({updateFields : filteredUpdateFields})
 
       const result = await response.json()
 
@@ -726,8 +728,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="laki-laki"
-                    checked={formData.gender === "laki-laki"}
+                    value="pria"
+                    checked={formData.gender === "pria"}
                     onChange={handleInputChange}
                     className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
                   />
@@ -737,8 +739,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="perempuan"
-                    checked={formData.gender === "perempuan"}
+                    value="wanita"
+                    checked={formData.gender === "wanita"}
                     onChange={handleInputChange}
                     className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
                   />
