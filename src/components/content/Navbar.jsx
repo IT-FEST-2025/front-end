@@ -334,7 +334,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 rounded-full"
               >
-                {hasProfilePicture ? ( // Kondisional untuk menampilkan gambar atau teks "pp"
+                {hasProfilePicture ? (
                   <img
                     src={profileImgSrc || "/placeholder.svg"}
                     alt="Profile"
@@ -346,11 +346,11 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                   <div
                     className={`w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer transition-opacity text-2xl font-bold ${
                       shouldUseRedBackground
-                        ? "text-white border-2 border-white"
+                        ? "text-gray-600 border-2 border-white"
                         : "text-gray-600 border-2 border-[#ff3131]"
                     }`}
                   >
-                    {user?.username ? user.username.charAt(0) : "PP"} {/* Gunakan user.username */}
+                    {user?.username ? user.username.charAt(0).toUpperCase() : "PP"} {/* Gunakan user.username */}
                   </div>
                 )}
               </button>
@@ -370,7 +370,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                           />
                         ) : (
                           <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer text-2xl font-bold text-gray-600 flex-shrink-0">
-                            {user?.username ? user.username.charAt(0) : "PP"} {/* Gunakan user.username */}
+                            {user?.username ? user.username.charAt(0).toUpperCase() : "PP"} {/* Gunakan user.username */}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">

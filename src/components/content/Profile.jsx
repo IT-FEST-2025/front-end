@@ -1,4 +1,4 @@
-// import { config } from "../../config"
+import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
 import { getProfileImageUrl } from "../../utils/profile-images" // Pastikan path ini benar
 
@@ -130,7 +130,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         const formData = new FormData()
         formData.append("image", blob, "profile.jpg") // 'image' adalah nama field dari README
 
-        const response = await fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
+        const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       }
 
       // Panggil endpoint DELETE di backend untuk menghapus foto profil
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
+      const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
         method: "DELETE", // Menggunakan metode DELETE
         headers: {
           Authorization: `Bearer ${token}`,
@@ -385,18 +385,18 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       }
 
       const updateFields = {
-        age: formData.age !== "" ? Number.parseInt(formData.age) : undefined,
-        gender: formData.gender !== "" ? formData.gender : undefined,
-        height_cm: formData.height !== "" ? Number.parseInt(formData.height) : undefined,
-        weight_kg: formData.weight !== "" ? Number.parseInt(formData.weight) : undefined,
+        age: formData.age !== "" ? Number.parseInt(formData.age) : null,
+        gender: formData.gender !== "" ? formData.gender : null,
+        height_cm: formData.height !== "" ? Number.parseInt(formData.height) : null,
+        weight_kg: formData.weight !== "" ? Number.parseInt(formData.weight) : null,
         smoking_status: formData.isActiveSmoker === "Ya" ? "aktif" : "tidak aktif",
         chronic_diseases: formData.medicalHistory
           .split(",")
           .map((item) => item.trim())
           .filter((item) => item !== ""),
-        fullName: formData.fullName !== user?.fullName ? formData.fullName : undefined, // Hanya kirim jika berubah
-        email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
-        username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
+        full_name: formData.fullName || null, // Hanya kirim jika berubah
+        // email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
+        // username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
       }
 
       // Filter nilai undefined untuk hanya mengirim bidang yang berubah
@@ -409,14 +409,16 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         filteredUpdateFields.chronic_diseases = []
       }
 
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/update/profile", {
+      const response = await fetch(`${config.apiUserService}/api/update/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(filteredUpdateFields),
+        body: JSON.stringify({updateFields : filteredUpdateFields}),
       })
+
+      console.log({updateFields : filteredUpdateFields})
 
       const result = await response.json()
 
@@ -603,7 +605,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="pt-20 pb-8 px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-[76rem] mx-auto">
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8 space-y-6">
             {/* Profile Picture Section dengan Username dan Full Name */}
             <div className="space-y-4">
@@ -681,8 +683,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                       type="text"
                       name="username"
                       value={formData.username}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
+                      readOnly
+                      className="cursor-not-allowed w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg"
                       placeholder=""
                     />
                   </div>
@@ -699,7 +701,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
+                  className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg"
                   placeholder=""
                 />
               </div>
@@ -726,10 +728,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="laki-laki"
-                    checked={formData.gender === "laki-laki"}
+                    value="pria"
+                    checked={formData.gender === "pria"}
                     onChange={handleInputChange}
-                    className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
+                    className="cursor-pointer w-4 h-4"
                   />
                   <span className="text-sm text-gray-700">Laki-laki</span>
                 </label>
@@ -737,10 +739,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                   <input
                     type="radio"
                     name="gender"
-                    value="perempuan"
-                    checked={formData.gender === "perempuan"}
+                    value="wanita"
+                    checked={formData.gender === "wanita"}
                     onChange={handleInputChange}
-                    className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
+                    className="cursor-pointer w-4 h-4"
                   />
                   <span className="text-sm text-gray-700">Perempuan</span>
                 </label>
@@ -757,7 +759,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                 name="age"
                 value={formData.age}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors"
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg"
                 placeholder=""
                 min="0"
               />
@@ -776,7 +778,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     name="height"
                     value={formData.height}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors pr-12"
+                    className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg pr-12"
                     placeholder=""
                     min="0"
                   />
@@ -795,7 +797,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     name="weight"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors pr-12"
+                    className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg pr-12"
                     placeholder=""
                     min="0"
                   />
@@ -814,7 +816,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                 value={formData.medicalHistory}
                 onChange={handleInputChange}
                 rows={3}
-                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ff3131] focus:border-[#ff3131] transition-colors resize-none"
+                className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg resize-none"
                 placeholder="Masukkan riwayat penyakit bawaan (jika ada)"
               />
             </div>
@@ -830,7 +832,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     value="Ya"
                     checked={formData.isActiveSmoker === "Ya"}
                     onChange={handleInputChange}
-                    className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
+                    className="cursor-pointer w-4 h-4"
                   />
                   <span className="text-sm text-gray-700">Ya</span>
                 </label>
@@ -841,7 +843,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     value="Tidak"
                     checked={formData.isActiveSmoker === "Tidak"}
                     onChange={handleInputChange}
-                    className="cursor-pointer w-4 h-4 text-[#ff3131] focus:ring-[#ff3131] focus:ring-2"
+                    className="cursor-pointer w-4 h-4"
                   />
                   <span className="text-sm text-gray-700">Tidak</span>
                 </label>

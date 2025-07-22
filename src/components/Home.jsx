@@ -36,7 +36,7 @@ const Home = ({ onNavigateToRegister }) => {
                       onClick={handleGetStarted}
                       className="cursor-pointer bg-white hover:scale-110 text-[#ff3131] shadow-[0_0_40px_#ffffff] hover:shadow-[0_0_40px_#ffffff] duration-300 px-8 py-4 rounded-lg font-semibold text-lg transition-all focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     >
-                      Masuk Sekarang
+                      Mulai Sekarang
                     </button>
                   </div>
                 </Animated>

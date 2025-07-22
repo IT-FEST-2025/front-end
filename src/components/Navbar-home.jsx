@@ -44,7 +44,7 @@ const Navbar = ({ onGetStarted }) => {
                   : "bg-[#ff3131] text-white hover:scale-110 transition-all duration-300 hover:shadow-[0_0_40px_#b81414] focus:ring-red-500"
               }`}
             >
-              Sign Up
+              Registrasi
             </button>
           </div>
         </div>

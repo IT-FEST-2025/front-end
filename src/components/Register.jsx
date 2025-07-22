@@ -1,4 +1,4 @@
-// import { config } from "../config"
+import { config } from "../config"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
 import Layout from "./layout/layout"
@@ -25,7 +25,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/register", {
+      const response = await fetch(`${config.apiUserService}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
   }
 
   return (
-    <Layout title="Sign Up" onBack={onNavigateToHome}>
+    <Layout title="Registrasi" onBack={onNavigateToHome}>
       <form onSubmit={handleFormSubmit} className="space-y-2 sm:space-y-3" noValidate>
         <FormInput
           id="email"
@@ -120,7 +120,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
               onClick={handleSignInClick}
               className="cursor-pointer text-white font-medium hover:underline transition-colors"
             >
-              Sign in di sini
+              Login di sini
             </button>
           </p>
         </div>

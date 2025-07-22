@@ -1,12 +1,13 @@
+import { config } from "../config"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import Layout from "./layout/layout" // Menggunakan Layout yang sama dengan Login.jsx
+import Layout from "./layout/layout"
 import FormInput from "./ui/form-input"
 import SubmitButton from "./ui/submit-button"
 
 const Reset = () => {
   const navigate = useNavigate()
-  const [step, setStep] = useState(1) // Step 1: Username, Step 2: Verify Code, Step 3: New Password
+  const [step, setStep] = useState(1)
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [resetCode, setResetCode] = useState("")
@@ -22,7 +23,7 @@ const Reset = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/forgot-password", {
+      const response = await fetch(`${config.apiUserService}/api/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +53,7 @@ const Reset = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/verify-reset-code", {
+      const response = await fetch(`${config.apiUserService}/api/verify-reset-code`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,7 +93,7 @@ const Reset = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/update-password", {
+      const response = await fetch(`${config.apiUserService}/api/update-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -166,8 +167,8 @@ const Reset = () => {
               id="email"
               name="email"
               type="email"
-              label="Alamat Email"
-              placeholder="Masukkan alamat email Anda"
+              label="Alamat E-mail"
+              placeholder="Masukkan alamat e-mail Anda"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

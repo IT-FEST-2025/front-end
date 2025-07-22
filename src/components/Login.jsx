@@ -1,4 +1,4 @@
-// import { config } from "../config"
+import { config } from "../config"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
@@ -23,7 +23,7 @@ const Login = ({ onLoginSuccess }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/login", {
+      const response = await fetch(`${config.apiUserService}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +63,7 @@ const Login = ({ onLoginSuccess }) => {
   }
 
   return (
-    <Layout title="Sign In" onBack={() => navigate("/")}>
+    <Layout title="Login" onBack={() => navigate("/")}>
       <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4" noValidate>
         <FormInput
           id="username"
@@ -114,7 +114,7 @@ const Login = ({ onLoginSuccess }) => {
               onClick={handleSignUpClick}
               className="cursor-pointer text-white hover:underline font-medium transition-colors"
             >
-              Sign up di sini
+              Registrasi di sini
             </button>
           </p>
         </div>

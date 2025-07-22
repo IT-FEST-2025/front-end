@@ -1,5 +1,5 @@
 // cek tampilan awal
-// import { config } from "./config"
+import { config } from "./config"
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
 import AuthContainer from "./components/auth-container"
@@ -24,7 +24,7 @@ function AppContent() {
 
     try {
       // Verify token validity
-      const response = await fetch("https://api.ayuwoki.my.id/users/api/me", {
+      const response = await fetch(`${config.apiUserService}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
