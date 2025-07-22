@@ -1,4 +1,4 @@
-import { config } from "../../config"
+// import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
 import { getProfileImageUrl } from "../../utils/profile-images" // Pastikan path ini benar
 
@@ -130,7 +130,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         const formData = new FormData()
         formData.append("image", blob, "profile.jpg") // 'image' adalah nama field dari README
 
-        const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
+        const response = await fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       }
 
       // Panggil endpoint DELETE di backend untuk menghapus foto profil
-      const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/api/photoprofile", {
         method: "DELETE", // Menggunakan metode DELETE
         headers: {
           Authorization: `Bearer ${token}`,
@@ -409,7 +409,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         filteredUpdateFields.chronic_diseases = []
       }
 
-      const response = await fetch(`${config.apiUserService}/api/update/profile`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/api/update/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
