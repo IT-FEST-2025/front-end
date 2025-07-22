@@ -23,10 +23,10 @@ const ContentContainer = ({ onLogout }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token")
-      const storedUser = localStorage.getItem("user")
+      const token = localStorage.getItem("accessToken") // Pastikan menggunakan "accessToken"
 
-      // If we have stored user data, use it immediately
+      // Jika ada data pengguna yang tersimpan, gunakan segera
+      const storedUser = localStorage.getItem("user")
       if (storedUser) {
         setUser(JSON.parse(storedUser))
       }
@@ -37,7 +37,7 @@ const ContentContainer = ({ onLogout }) => {
       }
 
       try {
-        // Fetch fresh user data
+        // Ambil data pengguna terbaru
         const response = await fetch(`${config.apiUserService}/api/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -45,48 +45,54 @@ const ContentContainer = ({ onLogout }) => {
         })
 
         if (!response.ok) {
-          throw new Error("Failed to fetch user data")
+          // Jika token tidak valid/kedaluwarsa, bersihkan dan arahkan ke login
+          if (response.status === 401) {
+            console.error("Token kedaluwarsa atau tidak valid. Harap login kembali.")
+            localStorage.removeItem("accessToken")
+            localStorage.removeItem("user") // Bersihkan data pengguna yang usang
+            setUser(null) // Set pengguna ke null untuk mencerminkan status logout
+            navigate("/login") // Arahkan ke halaman login
+          }
+          throw new Error("Gagal mengambil data pengguna")
         }
 
         const data = await response.json()
 
-        if (data.username && data.email) {
+        if (data.status === "success" && data.data) {
           const userData = {
-            username: data.username,
-            fullName: data.fullName,
-            email: data.email,
-            profilePicture: "",
+            username: data.data.username || "",
+            fullName: data.data.fullName || "",
+            email: data.data.email || "",
+            profilePicture: data.data.profilePicture || "", // Langsung gunakan nama file profilePicture
+            age: data.data.age || null,
+            gender: data.data.gender || "",
+            height: data.data.height || null,
+            weight: data.data.weight || null,
+            chronicDiseases: data.data.chronicDiseases || [],
+            smokingStatus: data.data.smokingStatus || "",
           }
-
-          // Fetch profile picture
-          try {
-            const photoResponse = await fetch(`${config.apiUserService}/api/photoprofile`, {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            })
-
-            const photoData = await photoResponse.json()
-            if (photoData.profilePictureUrl) {
-              userData.profilePicture = photoData.profilePictureUrl
-            }
-          } catch (photoError) {
-            console.error("Error fetching profile photo:", photoError)
-          }
-
           setUser(userData)
           localStorage.setItem("user", JSON.stringify(userData))
+        } else {
+          console.error("Respons API menunjukkan kegagalan atau data hilang:", data)
+          localStorage.removeItem("accessToken")
+          localStorage.removeItem("user")
+          setUser(null)
+          navigate("/login")
         }
       } catch (error) {
-        console.error("Error fetching user data:", error)
+        console.error("Error saat mengambil data pengguna:", error)
+        localStorage.removeItem("accessToken")
+        localStorage.removeItem("user")
+        setUser(null)
+        navigate("/login")
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchUserData()
-  }, [])
+  }, [navigate]) // Tambahkan navigate ke array dependensi
 
   const handleNavigation = (page) => {
     const targetPath = page === "home" ? "/beranda" : `/${page}`
@@ -97,13 +103,13 @@ const ContentContainer = ({ onLogout }) => {
     if (onLogout) onLogout()
   }
 
-  // Show loading state while fetching user data
+  // Tampilkan status loading saat mengambil data pengguna
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ff3131] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading user data...</p>
+          <p className="mt-4 text-gray-600">Memuat data pengguna...</p>
         </div>
       </div>
     )

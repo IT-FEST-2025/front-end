@@ -1,41 +1,51 @@
-// fitur chatbot
 import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
 import LoadingSpinner from "../ui/loading"
+import { getProfileImageUrl } from "../../utils/profile-images"
+
+// Define the API base URL
+const apiBaseUrl = `${config.apiChatbotService}`
+
+const apiFetch = async (method, endpoint, data = null) => {
+  const token = localStorage.getItem("accessToken")
+  if (!token) {
+    throw new Error("No access token found")
+  }
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  }
+  const options = {
+    method,
+    headers,
+  }
+  if (data) {
+    options.body = JSON.stringify(data)
+  }
+  const response = await fetch(`${apiBaseUrl}${endpoint}`, options)
+  if (!response.ok) {
+    throw new Error(`API error: ${response.statusText}`)
+  }
+  return response.json()
+}
+
+// Function to safely parse date from string or fallback to current time
+const parseSafeDate = (dateStr) => {
+  const date = new Date(dateStr)
+  return isNaN(date.getTime()) ? new Date() : date
+}
 
 const Chatbot = ({ user }) => {
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      role: "assistant",
-      content:
-        "Hello! I'm your AI health assistant. How can I help you today? You can describe your symptoms or ask any health-related questions.",
-      timestamp: new Date(),
-    },
-  ])
+  // Menerima prop user
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [currentChatId, setCurrentChatId] = useState(1)
-  const [chatHistory, setChatHistory] = useState([
-    {
-      id: 1,
-      title: "Percakapan baru",
-      lastMessage: "",
-      timestamp: new Date(),
-      messages: [
-        {
-          id: 1,
-          role: "assistant",
-          content:
-            "Hello! I'm your AI health assistant. How can I help you today? You can describe your symptoms or ask any health-related questions.",
-          timestamp: new Date(),
-        },
-      ],
-    },
-  ])
+  const [currentChatId, setCurrentChatId] = useState(null)
+  const [chatHistory, setChatHistory] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
-  const [loggedInUser, setLoggedInUser] = useState(null) // New state for fetched user data
+  // Hapus state loggedInUser, karena akan menggunakan prop user
+  // const [loggedInUser, setLoggedInUser] = useState(null)
 
   const messagesEndRef = useRef(null)
   const textareaRef = useRef(null)
@@ -48,56 +58,210 @@ const Chatbot = ({ user }) => {
     scrollToBottom()
   }, [messages])
 
-  // Fetch user profile on component mount
+  // Load current chat ID from localStorage and fetch data on mount
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem("accessToken")
-      if (token) {
-        try {
-          const response = await fetch(`${config.apiUserService}/api/me`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          })
-
-          if (!response.ok) {
-            // Handle token expiration or invalid token
-            if (response.status === 401) {
-              console.error("Token expired or invalid. Please log in again.")
-              localStorage.removeItem("accessToken") // Clear invalid token
-              // Optionally, you might want to redirect the user to the login page here
-            }
-            throw new Error("Failed to fetch user profile")
-          }
-
-          const result = await response.json()
-          if (result.status === "success" && result.data?.username) {
-            setLoggedInUser(result.data)
-          } else {
-            console.error("Failed to get username from profile data:", result)
-          }
-        } catch (error) {
-          console.error("Error fetching user profile:", error)
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken")
+        if (!token) {
+          console.error("No access token found")
+          return
         }
+        // Hapus pengambilan profil pengguna, karena akan bergantung pada prop `user`
+        // const userResponse = await fetch("https://api.ayuwoki.my.id/users/api/me", { ... })
+        // if (userResult.status === "success" && userResult.data?.username) { setLoggedInUser(userResult.data) }
+
+        // Fetch sessions
+        const sessionsResponse = await apiFetch("GET", "/api/session")
+        const sessions = sessionsResponse.data.map((session) => ({
+          id: session._id,
+          title: session.title || "Percakapan Baru", // Default to "Percakapan Baru" if title is missing
+          lastMessage: "",
+          timestamp: parseSafeDate(session.createdAt),
+          messages: [],
+        }))
+        setChatHistory(sessions)
+
+        // Restore last active chat from localStorage
+        const savedChatId = localStorage.getItem("currentChatId")
+        if (savedChatId && sessions.some((s) => s.id === savedChatId)) {
+          selectChat(savedChatId)
+        } else if (sessions.length > 0) {
+          selectChat(sessions[0].id)
+        } else {
+          createNewChat()
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error)
       }
     }
 
-    fetchUserProfile()
-  }, []) // Run once on component mount
+    fetchData()
+  }, []) // Tidak ada dependensi pada `user` di sini, karena ini untuk pemuatan riwayat obrolan awal
 
-  // fungsi untuk generate title dari inputan user
+  // Select a chat and fetch its messages
+  const selectChat = async (chatId) => {
+    setCurrentChatId(chatId)
+    localStorage.setItem("currentChatId", chatId) // Save current chat ID
+    try {
+      const response = await apiFetch("GET", `/api/chat/history/${chatId}`)
+      const fetchedMessages = response.data.map((msg) => ({
+        id: msg._id,
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.message,
+        timestamp: parseSafeDate(msg.createdAt),
+      }))
+      setMessages(fetchedMessages)
+    } catch (error) {
+      console.error("Error fetching messages:", error)
+    }
+  }
+
+  // Create a new chat session
+  const createNewChat = async () => {
+    try {
+      const response = await apiFetch("POST", "/api/session")
+      const newSession = response.data
+      const newChat = {
+        id: newSession._id,
+        title: "Percakapan Baru", // Set default title to "Percakapan Baru"
+        lastMessage: "",
+        timestamp: parseSafeDate(newSession.createdAt),
+        messages: [],
+      }
+      setChatHistory((prev) => [newChat, ...prev])
+      setCurrentChatId(newChat.id)
+      setMessages(newChat.messages) // No welcome message, just empty array
+      localStorage.setItem("currentChatId", newChat.id) // Save new chat ID
+    } catch (error) {
+      console.error("Error creating new session:", error)
+    }
+  }
+
+  // Send a message to the chatbot
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!input.trim() || isLoading) return
+
+    const userMessage = {
+      id: Date.now(),
+      role: "user",
+      content: input.trim(),
+      timestamp: new Date(),
+    }
+
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInput("")
+    setIsLoading(true)
+
+    try {
+      const response = await apiFetch("POST", "/api/chat", {
+        sessionId: currentChatId,
+        message: userMessage.content,
+      })
+      const botResponse = response.data
+      const botMessage = {
+        id: botResponse.id,
+        role: "assistant",
+        content: botResponse.message,
+        timestamp: parseSafeDate(botResponse.timestamp),
+      }
+      setMessages((prev) => [...prev, botMessage])
+
+      // Update chat history with last message and title (if first message)
+      setChatHistory((prev) =>
+        prev.map((chat) => {
+          if (chat.id === currentChatId) {
+            const isFirstMessage = newMessages.length === 1
+            return {
+              ...chat,
+              title: isFirstMessage ? generateChatTitle(userMessage.content) : chat.title,
+              lastMessage: getFirstFourWords(userMessage.content),
+              timestamp: new Date(),
+            }
+          }
+          return chat
+        }),
+      )
+    } catch (error) {
+      console.error("Error sending message:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Delete a chat session
+  const deleteChat = async (chatId, e) => {
+    e.stopPropagation()
+    if (chatHistory.length === 1) return
+
+    try {
+      await apiFetch("DELETE", `/api/session/${chatId}`)
+      setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId))
+      if (currentChatId === chatId) {
+        const remainingChats = chatHistory.filter((chat) => chat.id !== chatId)
+        if (remainingChats.length > 0) {
+          selectChat(remainingChats[0].id)
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting session:", error)
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e)
+    }
+  }
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = "auto"
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px"
+    }
+  }
+
+  useEffect(() => {
+    adjustTextareaHeight()
+  }, [input])
+
+  const formatTime = (date) => {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      return "Waktu Tidak Valid"
+    }
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  }
+
+  const formatDate = (date) => {
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      return "Tanggal Tidak Valid"
+    }
+    const now = new Date()
+    const diffTime = Math.abs(now - date)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 1) return "Hari ini"
+    if (diffDays === 2) return "Kemarin"
+    if (diffDays <= 7) return `${diffDays - 1} Hari yang Lalu`
+    return date.toLocaleDateString()
+  }
+
   const generateChatTitle = (userInput) => {
     const words = userInput.trim().split(/\s+/)
 
-    // fungsi untuk mengambil title chat history berdasarkan inputan user
     if (words.length <= 3) {
       return userInput.trim()
     } else if (words.length <= 6) {
       return words.slice(0, 4).join(" ")
     } else {
-      // menghapus konjungsi untuk title di chat history
       const importantWords = words.filter(
         (word) =>
           word.length > 3 &&
@@ -131,162 +295,9 @@ const Chatbot = ({ user }) => {
     }
   }
 
-  // fungsi untuk mengambiil 6 pesan terakhir untuk di chat history
   const getFirstFourWords = (text) => {
     const words = text.trim().split(/\s+/)
     return words.slice(0, 6).join(" ")
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!input.trim() || isLoading) return
-
-    const userMessage = {
-      id: Date.now(),
-      role: "user",
-      content: input.trim(),
-      timestamp: new Date(),
-    }
-
-    const newMessages = [...messages, userMessage]
-    setMessages(newMessages)
-
-    const currentInput = input.trim()
-    setInput("")
-    setIsLoading(true)
-
-    // update chat inputan user ke chat history
-    setChatHistory((prev) =>
-      prev.map((chat) => {
-        if (chat.id === currentChatId) {
-          const isFirstMessage = chat.title === "Percakapan baru"
-
-          return {
-            ...chat,
-            title: isFirstMessage ? generateChatTitle(currentInput) : chat.title,
-            messages: newMessages,
-            lastMessage: getFirstFourWords(currentInput),
-            timestamp: new Date(),
-          }
-        }
-        return chat
-      }),
-    )
-
-    // simulasi respons AI
-    setTimeout(() => {
-      const aiResponse = {
-        id: Date.now() + 1,
-        role: "assistant",
-        content:
-          "Thank you for sharing your symptoms. Based on what you've described, I recommend consulting with a healthcare professional for a proper diagnosis. In the meantime, here are some general suggestions that might help...",
-        timestamp: new Date(),
-      }
-
-      const finalMessages = [...newMessages, aiResponse]
-      setMessages(finalMessages)
-      setIsLoading(false)
-
-      // update title di chat history berdasarkan inputan user
-      setChatHistory((prev) =>
-        prev.map((chat) =>
-          chat.id === currentChatId
-            ? {
-                ...chat,
-                messages: finalMessages,
-                timestamp: new Date(),
-              }
-            : chat,
-        ),
-      )
-    }, 2000)
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      handleSubmit(e)
-    }
-  }
-
-  const adjustTextareaHeight = () => {
-    const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = "auto"
-      textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px"
-    }
-  }
-
-  useEffect(() => {
-    adjustTextareaHeight()
-  }, [input])
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    })
-  }
-
-  // format data untuk di chat history
-  const formatDate = (date) => {
-    const now = new Date()
-    const diffTime = Math.abs(now - date)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 1) return "Hari ini"
-    if (diffDays === 2) return "Kemarin"
-    if (diffDays <= 7) return `${diffDays - 1} Hari yang Lalu`
-    return date.toLocaleDateString()
-  }
-
-  // membuat chat baru
-  const createNewChat = () => {
-    const newChatId = Date.now()
-    const newChat = {
-      id: newChatId,
-      title: "Percakapan baru",
-      lastMessage: "",
-      timestamp: new Date(),
-      messages: [
-        {
-          id: 1,
-          role: "assistant",
-          content:
-            "Hello! I'm your AI health assistant. How can I help you today? You can describe your symptoms or ask any health-related questions.",
-          timestamp: new Date(),
-        },
-      ],
-    }
-
-    setChatHistory((prev) => [newChat, ...prev])
-    setCurrentChatId(newChatId)
-    setMessages(newChat.messages)
-  }
-
-  // pilih chat
-  const selectChat = (chatId) => {
-    const selectedChat = chatHistory.find((chat) => chat.id === chatId)
-    if (selectedChat) {
-      setCurrentChatId(chatId)
-      setMessages(selectedChat.messages)
-    }
-  }
-
-  // hapus chat history
-  const deleteChat = (chatId, e) => {
-    e.stopPropagation()
-    if (chatHistory.length === 1) return
-
-    setChatHistory((prev) => prev.filter((chat) => chat.id !== chatId))
-
-    if (currentChatId === chatId) {
-      const remainingChats = chatHistory.filter((chat) => chat.id !== chatId)
-      if (remainingChats.length > 0) {
-        selectChat(remainingChats[0].id)
-      }
-    }
   }
 
   const filteredChats = chatHistory.filter(
@@ -295,19 +306,18 @@ const Chatbot = ({ user }) => {
       chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
+  const profileImgSrc = getProfileImageUrl(user?.profilePicture)
+  const hasProfilePicture = user?.profilePicture && user.profilePicture !== ""
+
   return (
     <div className="h-screen bg-white flex flex-col lg:flex-row overflow-auto max-w-full">
-      {/* Sidebar - Modified widths: 3/4 on mobile/tablet, 1/4 on desktop */}
       <div
         className={`bg-white text-[#ff3131] transition-all duration-300 flex flex-col fixed inset-y-0 left-0 z-40 lg:relative lg:inset-auto lg:z-auto border-r border-gray-200 ${
           isSidebarOpen ? "w-3/4 lg:w-1/4" : "w-0"
         } overflow-hidden`}
       >
-        {/* Sidebar content */}
         <div className={`pt-16 flex flex-col h-full ${isSidebarOpen ? "block" : "hidden"}`}>
-          {/* Sidebar Header */}
           <div className="p-6 border-b border-gray-200">
-            {/* Mobile header with close button */}
             <div className="flex items-center justify-between mb-6 lg:hidden">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
@@ -334,8 +344,6 @@ const Chatbot = ({ user }) => {
                 </svg>
               </button>
             </div>
-
-            {/* Desktop header */}
             <div className="hidden lg:flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 bg-[#ff3131] rounded-full flex items-center justify-center">
@@ -362,8 +370,6 @@ const Chatbot = ({ user }) => {
                 </svg>
               </button>
             </div>
-
-            {/* New Chat Button */}
             <button
               onClick={createNewChat}
               className="w-full flex items-center space-x-4 px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -374,8 +380,6 @@ const Chatbot = ({ user }) => {
               <span className="text-base font-medium">Percakapan Baru</span>
             </button>
           </div>
-
-          {/* Search */}
           <div className="p-6 border-b border-gray-200">
             <div className="relative">
               <svg
@@ -400,8 +404,6 @@ const Chatbot = ({ user }) => {
               />
             </div>
           </div>
-
-          {/* Chat History */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-6">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Riwayat Percakapan</h3>
@@ -434,7 +436,7 @@ const Chatbot = ({ user }) => {
                     {chatHistory.length > 1 && (
                       <button
                         onClick={(e) => deleteChat(chat.id, e)}
-                        className={`opacity-0 group-hover:opacity-100 p-2 rounded transition-all ${
+                        className={`opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-opacity ${
                           currentChatId === chat.id ? "hover:bg-red-600" : "hover:bg-gray-200"
                         }`}
                       >
@@ -455,14 +457,11 @@ const Chatbot = ({ user }) => {
           </div>
         </div>
       </div>
-
-      {/* Main Content */}
       <div
         className={`relative flex-1 flex flex-col transition-all duration-300 min-w-0 ${
           isSidebarOpen ? "lg:opacity-100 opacity-80" : "opacity-100"
         }`}
       >
-        {/* Smaller Half-Circle Sidebar Toggle Button */}
         {!isSidebarOpen && (
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -481,17 +480,13 @@ const Chatbot = ({ user }) => {
             }}
           ></button>
         )}
-
-        {/* Messages Container */}
         <div className="absolute inset-0 flex flex-col">
-          {/* Messages Area */}
           <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-40">
-            {messages.length === 1 ? (
-              // Welcome Screen
+            {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center px-8 lg:px-16 py-8 lg:py-12">
                 <div className="text-center max-w-4xl w-full">
                   <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6">
-                    Halo, {loggedInUser?.username || user?.username || ""}!
+                    Halo, {user?.username || ""}! {/* Gunakan prop user */}
                   </h2>
                   <p className="text-gray-600 mb-8 lg:mb-12 text-lg lg:text-xl">
                     Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
@@ -499,27 +494,28 @@ const Chatbot = ({ user }) => {
                 </div>
               </div>
             ) : (
-              // Chat Messages
               <div className="px-8 lg:px-16 py-8 space-y-6">
-                {messages.slice(1).map((message) => (
+                {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div className={`flex max-w-[85%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      {/* Avatar */}
                       <div className={`flex-shrink-0 ${message.role === "user" ? "ml-4" : "mr-4"}`}>
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${
                             message.role === "user" ? "bg-gray-600" : "bg-[#ff3131]"
                           }`}
                         >
                           {message.role === "user" ? (
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            hasProfilePicture ? (
+                              <img
+                                src={profileImgSrc || "/placeholder.svg"}
+                                alt="User Profile"
+                                className="w-full h-full object-cover"
                               />
-                            </svg>
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white text-xl font-bold uppercase">
+                                {user?.username ? user.username.charAt(0) : "U"} {/* Gunakan user.username */}
+                              </div>
+                            )
                           ) : (
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
@@ -532,8 +528,6 @@ const Chatbot = ({ user }) => {
                           )}
                         </div>
                       </div>
-
-                      {/* Message Content */}
                       <div className={`flex flex-col ${message.role === "user" ? "items-end" : "items-start"}`}>
                         <div
                           className={`px-5 py-4 rounded-2xl max-w-full ${
@@ -549,8 +543,6 @@ const Chatbot = ({ user }) => {
                     </div>
                   </div>
                 ))}
-
-                {/* Loading indicator */}
                 {isLoading && (
                   <div className="flex justify-start">
                     <div className="flex max-w-[85%]">
@@ -575,13 +567,10 @@ const Chatbot = ({ user }) => {
                     </div>
                   </div>
                 )}
-
                 <div ref={messagesEndRef} />
               </div>
             )}
           </div>
-
-          {/* Input Area - Made Much Wider */}
           <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-8 lg:px-16 py-6">
             <form onSubmit={handleSubmit} className="flex items-end space-x-4 max-w-6xl mx-auto">
               <div className="flex-1 relative">
@@ -615,7 +604,6 @@ const Chatbot = ({ user }) => {
                 )}
               </button>
             </form>
-            {/* Helper text */}
             <div className="mt-3 px-1 max-w-6xl mx-auto">
               <p className="text-sm text-gray-500">
                 Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.

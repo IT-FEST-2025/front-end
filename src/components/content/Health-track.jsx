@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from "react"
 import { config } from "../../config"
+import { useState, useEffect, useCallback } from "react"
+import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Line, LineChart, CartesianGrid } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart"
 
 const HealthTrack = () => {
   const [currentStep, setCurrentStep] = useState(1)
@@ -19,12 +21,12 @@ const HealthTrack = () => {
   const [weeklyScores, setWeeklyScores] = useState([])
   const [apiAnalysisData, setApiAnalysisData] = useState(null)
   const [submissionMessage, setSubmissionMessage] = useState("")
+  const [restrictionMessage, setRestrictionMessage] = useState("")
   const [accessToken, setAccessToken] = useState(null)
   const [isStarted, setIsStarted] = useState(false)
 
   const totalSteps = 9
   const progress = (currentStep / totalSteps) * 100
-
   const USER_ID = 4
 
   const fetchApiAnalysisData = useCallback(async () => {
@@ -34,7 +36,7 @@ const HealthTrack = () => {
       return
     }
     try {
-      const response = await fetch(`${config.apiUserService}/tracker`, {
+      const response = await fetch(`${config.apiUserService}/tracker?range=7d`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -57,7 +59,6 @@ const HealthTrack = () => {
   useEffect(() => {
     const storedWeeklyScores = JSON.parse(localStorage.getItem("weeklyScores") || "[]")
     const storedAccessToken = localStorage.getItem("accessToken")
-
     setWeeklyScores(storedWeeklyScores)
     setAccessToken(storedAccessToken)
   }, [])
@@ -92,12 +93,12 @@ const HealthTrack = () => {
       case "0":
         return 0
       case "<10":
-        return 5
+        return 10
       case "10–30":
         return 20
       case "30–60":
         return 45
-      case "60+":
+      case ">60":
         return 75
       default:
         return 0
@@ -127,6 +128,144 @@ const HealthTrack = () => {
     return type.toLowerCase().replace(/\s/g, "_")
   }
 
+  const calculateDiagnifyScore = (averages) => {
+    let score = 0
+    let maxScore = 0
+
+    // Sleep Score (0-20 points)
+    maxScore += 20
+    if (averages.sleepHours >= 7 && averages.sleepHours <= 9) {
+      score += 20
+    } else if (averages.sleepHours >= 6 && averages.sleepHours < 7) {
+      score += 15
+    } else if (averages.sleepHours >= 5 && averages.sleepHours < 6) {
+      score += 10
+    } else {
+      score += 5
+    }
+
+    // Exercise Score (0-15 points)
+    maxScore += 15
+    if (averages.exerciseMinutes >= 30) {
+      score += 15
+    } else if (averages.exerciseMinutes >= 20) {
+      score += 12
+    } else if (averages.exerciseMinutes >= 10) {
+      score += 8
+    } else if (averages.exerciseMinutes > 0) {
+      score += 5
+    }
+
+    // Water Intake Score (0-10 points)
+    maxScore += 10
+    if (averages.waterGlasses >= 8) {
+      score += 10
+    } else if (averages.waterGlasses >= 6) {
+      score += 8
+    } else if (averages.waterGlasses >= 4) {
+      score += 6
+    } else {
+      score += 3
+    }
+
+    // Junk Food Score (0-10 points)
+    maxScore += 10
+    if (averages.junkFoodCount <= 1) {
+      score += 10
+    } else if (averages.junkFoodCount <= 3) {
+      score += 7
+    } else if (averages.junkFoodCount <= 5) {
+      score += 4
+    } else {
+      score += 1
+    }
+
+    // Mood Score (0-15 points)
+    maxScore += 15
+    if (averages.overallMood >= 4) {
+      score += 15
+    } else if (averages.overallMood >= 3) {
+      score += 12
+    } else if (averages.overallMood >= 2) {
+      score += 8
+    } else {
+      score += 5
+    }
+
+    // Stress Level Score (0-10 points)
+    maxScore += 10
+    if (averages.stressLevel <= 2) {
+      score += 10
+    } else if (averages.stressLevel <= 3) {
+      score += 8
+    } else if (averages.stressLevel <= 4) {
+      score += 5
+    } else {
+      score += 2
+    }
+
+    // Screen Time Score (0-10 points)
+    maxScore += 10
+    if (averages.screenTimeHours <= 6) {
+      score += 10
+    } else if (averages.screenTimeHours <= 8) {
+      score += 8
+    } else if (averages.screenTimeHours <= 12) {
+      score += 5
+    } else {
+      score += 2
+    }
+
+    // Blood Pressure Score (0-10 points)
+    maxScore += 10
+    if (averages.bloodPressure <= 120) {
+      score += 10
+    } else if (averages.bloodPressure <= 130) {
+      score += 8
+    } else if (averages.bloodPressure <= 140) {
+      score += 6
+    } else if (averages.bloodPressure <= 160) {
+      score += 4
+    } else {
+      score += 2
+    }
+
+    return (score / maxScore) * 100
+  }
+
+  const categorizeHealth = (averages) => {
+    return {
+      sleep: averages.sleepHours >= 7 ? "Baik" : averages.sleepHours >= 6 ? "Cukup" : "Kurang",
+      exercise: averages.exerciseMinutes >= 30 ? "Aktif" : averages.exerciseMinutes >= 15 ? "Cukup" : "Kurang Aktif",
+      hydration: averages.waterGlasses >= 8 ? "Terhidrasi" : averages.waterGlasses >= 6 ? "Cukup" : "Dehidrasi",
+      diet: averages.junkFoodCount <= 2 ? "Sehat" : averages.junkFoodCount <= 4 ? "Cukup" : "Tidak Sehat",
+      mental: averages.overallMood >= 4 ? "Baik" : averages.overallMood >= 3 ? "Cukup" : "Buruk",
+      stress: averages.stressLevel <= 2 ? "Rendah" : averages.stressLevel <= 3 ? "Sedang" : "Tinggi",
+      screenTime: averages.screenTimeHours <= 6 ? "Baik" : averages.screenTimeHours <= 10 ? "Cukup" : "Berlebihan",
+      bloodPressure: averages.bloodPressure <= 120 ? "Normal" : averages.bloodPressure <= 140 ? "Tinggi" : "Berbahaya",
+    }
+  }
+
+  const getScoreCategory = (score) => {
+    if (score >= 85) return "Sangat Baik"
+    if (score >= 70) return "Baik"
+    if (score >= 55) return "Kurang"
+    if (score >= 40) return "Buruk"
+    return "Sangat Buruk"
+  }
+
+  const handleStart = () => {
+    const todayDate = new Date().toISOString().split("T")[0]
+    const hasSubmittedToday = weeklyScores.some((entry) => entry.date === todayDate)
+
+    if (hasSubmittedToday) {
+      setRestrictionMessage("Anda sudah mengisi, silakan coba lagi besok.")
+    } else {
+      setRestrictionMessage("")
+      setIsStarted(true)
+    }
+  }
+
   const handleAnalysis = async () => {
     if (!accessToken) {
       alert("Anda perlu login untuk mengirim data kesehatan.")
@@ -135,12 +274,12 @@ const HealthTrack = () => {
 
     const exerciseMinutes = mapExerciseDurationToMinutes(formData.exerciseDuration)
     const junkFoodCount = mapJunkFoodFrequencyToNumber(formData.junkFoodFrequency)
-    const sleepHoursNum = Number.parseInt(formData.sleepHours)
-    const waterIntakeNum = Number.parseInt(formData.waterIntake)
-    const moodNum = Number.parseInt(formData.mood)
-    const stressNum = Number.parseInt(formData.stress)
-    const screenTimeNum = Number.parseFloat(formData.screenTime)
-    const systolicBPNum = Number.parseInt(formData.systolicBP)
+    const sleepHoursNum = Number.parseInt(formData.sleepHours) || 0
+    const waterIntakeNum = Number.parseInt(formData.waterIntake) || 0
+    const moodNum = Number.parseInt(formData.mood) || 1
+    const stressNum = Number.parseInt(formData.stress) || 1
+    const screenTimeNum = Number.parseFloat(formData.screenTime) || 0
+    const systolicBPNum = Number.parseInt(formData.systolicBP) || 120
 
     const payload = {
       user_id: USER_ID,
@@ -170,10 +309,22 @@ const HealthTrack = () => {
       if (response.ok && data.status === "success") {
         setSubmissionMessage("Data kesehatan berhasil disimpan!")
 
-        // Update weekly scores for local chart
-        const currentOverallScore = getOverallScore(getAnalysisData())
+        // Calculate daily score
+        const dailyAverages = {
+          exerciseMinutes: exerciseMinutes,
+          sleepHours: sleepHoursNum,
+          waterGlasses: waterIntakeNum,
+          junkFoodCount: junkFoodCount,
+          overallMood: moodNum,
+          stressLevel: stressNum,
+          screenTimeHours: screenTimeNum,
+          bloodPressure: systolicBPNum,
+        }
+        const dailyScore = calculateDiagnifyScore(dailyAverages)
+
+        // Update weekly scores for local chart, allowing multiple submissions
         const todayDate = new Date().toISOString().split("T")[0]
-        const updatedWeeklyScores = [...weeklyScores, { date: todayDate, score: currentOverallScore }].slice(-7)
+        const updatedWeeklyScores = [...weeklyScores, { date: todayDate, score: dailyScore }]
         localStorage.setItem("weeklyScores", JSON.stringify(updatedWeeklyScores))
         setWeeklyScores(updatedWeeklyScores)
 
@@ -204,79 +355,84 @@ const HealthTrack = () => {
     const screenTimeNum = Number.parseFloat(formData.screenTime) || 0
     const systolicBPNum = Number.parseInt(formData.systolicBP) || 120
 
-    const analysis = {
+    const averages = {
+      exerciseMinutes,
+      sleepHours: sleepHoursNum,
+      waterGlasses: waterIntakeNum,
+      junkFoodCount,
+      overallMood: moodNum,
+      stressLevel: stressNum,
+      screenTimeHours: screenTimeNum,
+      bloodPressure: systolicBPNum,
+    }
+
+    const score = calculateDiagnifyScore(averages)
+    const categories = categorizeHealth(averages)
+
+    return {
       physicalActivity: {
         score:
-          exerciseMinutes >= 60
-            ? 100
-            : exerciseMinutes >= 30
-              ? 80
-              : exerciseMinutes >= 10
-                ? 60
-                : exerciseMinutes > 0
-                  ? 40
-                  : 20,
-        status:
-          exerciseMinutes >= 60
-            ? "Excellent"
-            : exerciseMinutes >= 30
-              ? "Good"
-              : exerciseMinutes >= 10
-                ? "Fair"
-                : "Needs Improvement",
+          averages.exerciseMinutes >= 30
+            ? 15
+            : averages.exerciseMinutes >= 20
+              ? 12
+              : averages.exerciseMinutes >= 10
+                ? 8
+                : averages.exerciseMinutes > 0
+                  ? 5
+                  : 0,
+        status: categories.exercise,
       },
       sleep: {
-        score: sleepHoursNum >= 7 && sleepHoursNum <= 9 ? 100 : sleepHoursNum >= 6 ? 70 : 40,
-        status: sleepHoursNum >= 7 && sleepHoursNum <= 9 ? "Optimal" : sleepHoursNum >= 6 ? "Adequate" : "Insufficient",
+        score:
+          averages.sleepHours >= 7 && averages.sleepHours <= 9
+            ? 20
+            : averages.sleepHours >= 6
+              ? 15
+              : averages.sleepHours >= 5
+                ? 10
+                : 5,
+        status: categories.sleep,
       },
       hydration: {
-        score: waterIntakeNum >= 8 ? 100 : waterIntakeNum >= 6 ? 80 : waterIntakeNum >= 4 ? 60 : 40,
-        status: waterIntakeNum >= 8 ? "Excellent" : waterIntakeNum >= 6 ? "Good" : "Needs Improvement",
+        score: averages.waterGlasses >= 8 ? 10 : averages.waterGlasses >= 6 ? 8 : averages.waterGlasses >= 4 ? 6 : 3,
+        status: categories.hydration,
       },
       mentalHealth: {
-        score: (moodNum + (6 - stressNum)) * 10,
-        status: moodNum >= 4 && stressNum <= 2 ? "Good" : moodNum >= 3 && stressNum <= 3 ? "Fair" : "Needs Attention",
+        score: averages.overallMood >= 4 ? 15 : averages.overallMood >= 3 ? 12 : averages.overallMood >= 2 ? 8 : 5,
+        status: categories.mental,
       },
       junkFood: {
-        score: junkFoodCount === 0 ? 100 : junkFoodCount <= 1 ? 80 : junkFoodCount <= 2 ? 60 : 40,
-        status: junkFoodCount === 0 ? "Excellent" : junkFoodCount <= 1 ? "Good" : "Needs Improvement",
+        score: averages.junkFoodCount <= 1 ? 10 : averages.junkFoodCount <= 3 ? 7 : averages.junkFoodCount <= 5 ? 4 : 1,
+        status: categories.diet,
       },
       screenTime: {
-        score: screenTimeNum <= 2 ? 100 : screenTimeNum <= 4 ? 80 : screenTimeNum <= 6 ? 60 : 40,
-        status: screenTimeNum <= 2 ? "Optimal" : screenTimeNum <= 4 ? "Moderate" : "High",
+        score:
+          averages.screenTimeHours <= 6
+            ? 10
+            : averages.screenTimeHours <= 8
+              ? 8
+              : averages.screenTimeHours <= 12
+                ? 5
+                : 2,
+        status: categories.screenTime,
       },
       bloodPressure: {
         score:
-          systolicBPNum >= 90 && systolicBPNum <= 120
-            ? 100
-            : systolicBPNum >= 121 && systolicBPNum <= 139
-              ? 80
-              : systolicBPNum >= 140 || systolicBPNum < 90
-                ? 60
-                : 40,
-        status:
-          systolicBPNum >= 90 && systolicBPNum <= 120
-            ? "Optimal"
-            : systolicBPNum >= 121 && systolicBPNum <= 139
-              ? "Pre-hypertension"
-              : "High/Low",
+          averages.bloodPressure <= 120
+            ? 10
+            : averages.bloodPressure <= 130
+              ? 8
+              : averages.bloodPressure <= 140
+                ? 6
+                : averages.bloodPressure <= 160
+                  ? 4
+                  : 2,
+        status: categories.bloodPressure,
       },
+      overallScore: score,
+      scoreCategory: getScoreCategory(score),
     }
-    return analysis
-  }
-
-  const getOverallScore = (analysis) => {
-    const scores = [
-      analysis.physicalActivity.score,
-      analysis.sleep.score,
-      analysis.hydration.score,
-      analysis.mentalHealth.score,
-      analysis.junkFood.score,
-      analysis.screenTime.score,
-      analysis.bloodPressure.score,
-    ]
-    const totalScore = scores.reduce((sum, score) => sum + score, 0)
-    return Math.round(totalScore / scores.length)
   }
 
   if (!isStarted) {
@@ -290,12 +446,13 @@ const HealthTrack = () => {
           </p>
           <div className="space-y-4">
             <button
-              onClick={() => setIsStarted(true)}
+              onClick={handleStart}
               className="w-full bg-[#ff3131] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors h-12"
             >
               Mulai Sekarang
             </button>
-            {apiAnalysisData && (
+            {restrictionMessage && <p className="text-red-600 text-sm">{restrictionMessage}</p>}
+            {accessToken && (
               <button
                 onClick={() => {
                   setIsStarted(true)
@@ -314,13 +471,28 @@ const HealthTrack = () => {
 
   if (showAnalysis) {
     const localAnalysis = getAnalysisData()
-    const overallScore = getOverallScore(localAnalysis)
 
-    const chartLabels = weeklyScores.map((entry) => {
-      const date = new Date(entry.date)
-      return `${date.getDate()}/${date.getMonth() + 1}`
-    })
-    const chartData = weeklyScores.map((entry) => entry.score)
+    // Data for daily health categories bar chart
+    const dailyChartData = [
+      { name: "Aktivitas Fisik", score: localAnalysis.physicalActivity.score, max: 15 },
+      { name: "Kualitas Tidur", score: localAnalysis.sleep.score, max: 20 },
+      { name: "Hidrasi", score: localAnalysis.hydration.score, max: 10 },
+      { name: "Kesehatan Mental", score: localAnalysis.mentalHealth.score, max: 15 },
+      { name: "Pola Makan", score: localAnalysis.junkFood.score, max: 10 },
+      { name: "Digital Wellbeing", score: localAnalysis.screenTime.score, max: 10 },
+      { name: "Tekanan Darah", score: localAnalysis.bloodPressure.score, max: 10 },
+    ]
+
+    // Updated dailyChartConfig to match ChartContainer's expectations
+    const dailyChartConfig = {
+      "Aktivitas-Fisik": { label: "Aktivitas Fisik", color: "hsl(210 80% 60%)" }, // Blue
+      "Kualitas-Tidur": { label: "Kualitas Tidur", color: "hsl(270 70% 60%)" }, // Purple
+      Hidrasi: { label: "Hidrasi", color: "hsl(120 70% 50%)" }, // Green
+      "Kesehatan-Mental": { label: "Kesehatan Mental", color: "hsl(45 90% 60%)" }, // Orange-Yellow
+      "Pola-Makan": { label: "Pola Makan", color: "hsl(15 80% 60%)" }, // Orange
+      "Digital-Wellbeing": { label: "Digital Wellbeing", color: "hsl(180 70% 50%)" }, // Cyan
+      "Tekanan-Darah": { label: "Tekanan Darah", color: "hsl(0 80% 60%)" }, // Red
+    }
 
     return (
       <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4">
@@ -328,150 +500,235 @@ const HealthTrack = () => {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Analisis Kesehatan Anda</h1>
-              <p className="text-gray-600">Berdasarkan data yang Anda berikan</p>
+              <p className="text-gray-600">Berdasarkan data harian dan mingguan Anda</p>
             </div>
 
             {/* Overall Score */}
             <div className="bg-gradient-to-r from-[#ff3131] to-red-600 rounded-xl p-6 text-white mb-8">
               <div className="text-center">
-                <div className="text-4xl font-bold mb-2">{overallScore}/100</div>
-                <div className="text-xl">Skor Kesehatan Keseluruhan Harian</div>
+                <div className="text-4xl font-bold mb-2">{Math.round(localAnalysis.overallScore)}/100</div>
+                <div className="text-xl">Skor Kesehatan Harian ({localAnalysis.scoreCategory})</div>
               </div>
             </div>
 
-            {/* Weekly Overall Score Diagram */}
-            {weeklyScores.length > 0 && (
-              <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
-                <h3 className="text-lg font-semibold mb-4">Tren Skor Kesehatan Mingguan</h3>
-                <div className="w-full h-64">
-                  <pre className="mermaid">
-                    {`
-                  lineChart
-                    title "Skor Kesehatan Keseluruhan (7 Hari Terakhir)"
-                    xLabels [${chartLabels.map((label) => `"${label}"`).join(", ")}]
-                    series "Skor"
-                      data [${chartData.join(", ")}]
-                  `}
-                  </pre>
+            {/* Weekly Overall Score */}
+            {apiAnalysisData && (
+              <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-6 text-white mb-8">
+                <div className="text-center">
+                  <div className="text-4xl font-bold mb-2">{Math.round(apiAnalysisData.diagnifyScore)}/100</div>
+                  <div className="text-xl">Skor Kesehatan Mingguan ({apiAnalysisData.scoreCategory})</div>
                 </div>
               </div>
             )}
 
-            {/* Detailed Analysis Diagram */}
-            <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4">Analisis Kategori Kesehatan</h3>
-              <div className="w-full h-64">
-                <pre className="mermaid">
-                  {`
-                barChart
-                  title "Skor Kategori Kesehatan Harian"
-                  xAxis "Kategori"
-                  yAxis "Skor (0-100)"
-                  series "Skor"
-                    Aktivitas Fisik: ${localAnalysis.physicalActivity.score}
-                    Tidur: ${localAnalysis.sleep.score}
-                    Hidrasi: ${localAnalysis.hydration.score}
-                    Kesehatan Mental: ${localAnalysis.mentalHealth.score}
-                    Junk Food: ${localAnalysis.junkFood.score}
-                    Screen Time: ${localAnalysis.screenTime.score}
-                    Tekanan Darah: ${localAnalysis.bloodPressure.score}
-                `}
-                </pre>
+            {/* Weekly Trend Diagram */}
+            {weeklyScores.length > 0 && (
+              <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
+                <h3 className="text-lg font-semibold mb-4">Tren Skor Kesehatan Mingguan</h3>
+                <ChartContainer
+                  config={{
+                    score: {
+                      label: "Skor",
+                      color: "#ff3131", // Red
+                    },
+                  }}
+                  className="min-h-[300px] w-full"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      accessibilityLayer
+                      data={weeklyScores}
+                      margin={{
+                        top: 20,
+                        right: 20,
+                        left: 0,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        tickLine={false}
+                        axisLine={false}
+                        tickMargin={8}
+                        tickFormatter={(value) => {
+                          const date = new Date(value)
+                          return `${date.getDate()}/${date.getMonth() + 1}`
+                        }}
+                      />
+                      <YAxis dataKey="score" tickLine={false} axisLine={false} tickMargin={8} domain={[0, 100]} />
+                      <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                      <Line
+                        dataKey="score"
+                        type="monotone"
+                        stroke="var(--color-score)"
+                        strokeWidth={2}
+                        dot={{
+                          fill: "var(--color-score)",
+                          stroke: "var(--color-score)",
+                        }}
+                        activeDot={{
+                          r: 6,
+                          fill: "var(--color-score)",
+                          stroke: "var(--color-score)",
+                        }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
               </div>
+            )}
+
+            {/* Daily Health Categories Bar Chart */}
+            <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
+              <h3 className="text-lg font-semibold mb-4">Skor Kategori Kesehatan Harian</h3>
+              <ChartContainer id="daily" config={dailyChartConfig} className="min-h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    accessibilityLayer
+                    data={dailyChartData}
+                    margin={{
+                      top: 20,
+                      right: 20,
+                      left: 0,
+                      bottom: 5,
+                    }}
+                  >
+                    <XAxis
+                      dataKey="name"
+                      type="category"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      tickFormatter={(value) => value}
+                    />
+                    <YAxis
+                      dataKey="score"
+                      type="number"
+                      domain={[0, (dataMax) => Math.max(dataMax, 20)]}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => value}
+                    />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel={false} />} />
+                    <Bar
+                      dataKey="score"
+                      radius={5}
+                      fillOpacity={0.8}
+                      fill={(entry) => {
+                        // Cari key config berdasarkan label (label === entry.name)
+                        const matched = Object.entries(dailyChartConfig).find(([, value]) => value.label === entry.name)
+                        const colorKey = matched?.[0] || "chart-1" // fallback jika tidak ditemukan
+                        return `var(--color-${colorKey})`
+                      }}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </div>
 
             {/* Detailed Analysis Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">🏃</span>
+              {[
+                {
+                  title: "Aktivitas Fisik",
+                  emoji: "🏃",
+                  bgClass: "bg-blue-50",
+                  textColorClass: "text-blue-600",
+                  circleBgClass: "bg-blue-500",
+                  daily: localAnalysis.physicalActivity,
+                  weekly: apiAnalysisData?.healthCategories?.exercise,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.exerciseMinutes,
+                },
+                {
+                  title: "Kualitas Tidur",
+                  emoji: "😴",
+                  bgClass: "bg-purple-50",
+                  textColorClass: "text-purple-600",
+                  circleBgClass: "bg-purple-500",
+                  daily: localAnalysis.sleep,
+                  weekly: apiAnalysisData?.healthCategories?.sleep,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.sleepHours,
+                },
+                {
+                  title: "Hidrasi",
+                  emoji: "💧",
+                  bgClass: "bg-green-50",
+                  textColorClass: "text-green-600",
+                  circleBgClass: "bg-green-500",
+                  daily: localAnalysis.hydration,
+                  weekly: apiAnalysisData?.healthCategories?.hydration,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.waterGlasses,
+                },
+                {
+                  title: "Kesehatan Mental",
+                  emoji: "😊",
+                  bgClass: "bg-yellow-50",
+                  textColorClass: "text-yellow-600",
+                  circleBgClass: "bg-yellow-500",
+                  daily: localAnalysis.mentalHealth,
+                  weekly: apiAnalysisData?.healthCategories?.mental,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.overallMood,
+                },
+                {
+                  title: "Pola Makan (Junk Food)",
+                  emoji: "🍔",
+                  bgClass: "bg-orange-50",
+                  textColorClass: "text-orange-600",
+                  circleBgClass: "bg-orange-500",
+                  daily: localAnalysis.junkFood,
+                  weekly: apiAnalysisData?.healthCategories?.diet,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.junkFoodCount,
+                },
+                {
+                  title: "Digital Wellbeing (Screen Time)",
+                  emoji: "📱",
+                  bgClass: "bg-cyan-50",
+                  textColorClass: "text-cyan-600",
+                  circleBgClass: "bg-cyan-500",
+                  daily: localAnalysis.screenTime,
+                  weekly: apiAnalysisData?.healthCategories?.screenTime,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.screenTimeHours,
+                },
+                {
+                  title: "Tekanan Darah",
+                  emoji: "🩺",
+                  bgClass: "bg-red-50",
+                  textColorClass: "text-red-600",
+                  circleBgClass: "bg-red-500",
+                  daily: localAnalysis.bloodPressure,
+                  weekly: apiAnalysisData?.healthCategories?.bloodPressure,
+                  weeklyAvg: apiAnalysisData?.analysis.averages.bloodPressure,
+                },
+              ].map((category) => (
+                <div key={category.title} className={`${category.bgClass} rounded-lg p-6`}>
+                  <div className="flex items-center mb-4">
+                    <div
+                      className={`w-10 h-10 ${category.circleBgClass} rounded-full flex items-center justify-center mr-3`}
+                    >
+                      <span className="text-white font-bold">{category.emoji}</span>
+                    </div>
+                    <h3 className="text-lg font-semibold">{category.title}</h3>
                   </div>
-                  <h3 className="text-lg font-semibold">Aktivitas Fisik</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-blue-600">{localAnalysis.physicalActivity.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.physicalActivity.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-purple-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">😴</span>
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-2xl font-bold ${category.textColorClass}`}>
+                        {category.daily.score}/
+                        {category.title === "Aktivitas Fisik" ? 15 : category.title === "Kualitas Tidur" ? 20 : 10}
+                      </span>
+                      <span className="text-sm text-gray-600">Harian: {category.daily.status}</span>
+                    </div>
+                    {category.weekly && (
+                      <div className="flex items-center justify-between">
+                        <span className={`text-lg ${category.textColorClass}`}>
+                          Rata-rata: {Math.round(category.weeklyAvg * 10) / 10}
+                        </span>
+                        <span className="text-sm text-gray-600">Mingguan: {category.weekly}</span>
+                      </div>
+                    )}
                   </div>
-                  <h3 className="text-lg font-semibold">Kualitas Tidur</h3>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-purple-600">{localAnalysis.sleep.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.sleep.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-green-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">💧</span>
-                  </div>
-                  <h3 className="text-lg font-semibold">Hidrasi</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-green-600">{localAnalysis.hydration.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.hydration.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-yellow-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">😊</span>
-                  </div>
-                  <h3 className="text-lg font-semibold">Kesehatan Mental</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-yellow-600">{localAnalysis.mentalHealth.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.mentalHealth.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-orange-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">🍔</span>
-                  </div>
-                  <h3 className="text-lg font-semibold">Pola Makan (Junk Food)</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-orange-600">{localAnalysis.junkFood.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.junkFood.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-cyan-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">📱</span>
-                  </div>
-                  <h3 className="text-lg font-semibold">Digital Wellbeing (Screen Time)</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-cyan-600">{localAnalysis.screenTime.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.screenTime.status}</span>
-                </div>
-              </div>
-
-              <div className="bg-red-50 rounded-lg p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-bold">🩺</span>
-                  </div>
-                  <h3 className="text-lg font-semibold">Tekanan Darah</h3>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-red-600">{localAnalysis.bloodPressure.score}/100</span>
-                  <span className="text-sm text-gray-600">{localAnalysis.bloodPressure.status}</span>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Recommendations */}
@@ -495,99 +752,24 @@ const HealthTrack = () => {
                     </li>
                   ))
                 ) : (
-                  <>
-                    {localAnalysis.physicalActivity.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Tingkatkan aktivitas fisik Anda menjadi minimal 30 menit per hari
-                      </li>
-                    )}
-                    {localAnalysis.sleep.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Usahakan tidur 7-9 jam per malam untuk kesehatan optimal
-                      </li>
-                    )}
-                    {localAnalysis.hydration.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Tingkatkan konsumsi air putih menjadi minimal 8 gelas per hari
-                      </li>
-                    )}
-                    {localAnalysis.mentalHealth.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Pertimbangkan teknik relaksasi atau konsultasi untuk mengelola stres
-                      </li>
-                    )}
-                    {localAnalysis.junkFood.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Kurangi konsumsi makanan olahan/junk food.
-                      </li>
-                    )}
-                    {localAnalysis.screenTime.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Batasi waktu layar Anda untuk kesehatan mata dan mental.
-                      </li>
-                    )}
-                    {localAnalysis.bloodPressure.score < 70 && (
-                      <li className="flex items-start">
-                        <span className="text-[#ff3131] mr-2">•</span>
-                        Pantau tekanan darah Anda secara teratur dan konsultasikan dengan dokter jika ada kekhawatiran.
-                      </li>
-                    )}
-                    {localAnalysis.physicalActivity.score >= 70 &&
-                      localAnalysis.sleep.score >= 70 &&
-                      localAnalysis.hydration.score >= 70 &&
-                      localAnalysis.mentalHealth.score >= 70 &&
-                      localAnalysis.junkFood.score >= 70 &&
-                      localAnalysis.screenTime.score >= 70 &&
-                      localAnalysis.bloodPressure.score >= 70 && (
-                        <li className="flex items-start">
-                          <span className="text-green-500 mr-2">•</span>
-                          Pertahankan kebiasaan sehat Anda!
-                        </li>
-                      )}
-                  </>
+                  <li className="flex items-start">
+                    <span className="text-green-500 mr-2">•</span>
+                    Pertahankan kebiasaan sehat Anda!
+                  </li>
                 )}
               </ul>
             </div>
 
-            <div className="flex justify-center gap-4 mt-8">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
               <button
                 onClick={() => {
                   setShowAnalysis(false)
                   setIsStarted(false)
                   setSubmissionMessage("")
                 }}
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-medium transition-colors h-12 min-w-[200px]"
+                className="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-medium transition-colors h-12 min-w-[200px]"
               >
                 Kembali ke Beranda
-              </button>
-              <button
-                onClick={() => {
-                  setShowAnalysis(false)
-                  setCurrentStep(1)
-                  setFormData({
-                    exerciseDuration: "",
-                    exerciseType: "",
-                    sleepHours: "",
-                    waterIntake: "",
-                    junkFoodFrequency: "",
-                    mood: "",
-                    stress: "",
-                    screenTime: "",
-                    bloodPressureKnown: "",
-                    systolicBP: "",
-                  })
-                  setSubmissionMessage("")
-                  setIsStarted(true)
-                }}
-                className="bg-[#ff3131] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors h-12 min-w-[200px]"
-              >
-                Isi Form Baru
               </button>
             </div>
           </div>
@@ -606,9 +788,8 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Aktivitas Fisik</h2>
               <p className="text-gray-600">Berapa menit kamu berolahraga atau bergerak aktif hari ini?</p>
             </div>
-
             <div className="space-y-3">
-              {["0", "<10", "10–30", "30–60", "60+"].map((option) => (
+              {["0", "<10", "10–30", "30–60", ">60"].map((option) => (
                 <button
                   key={option}
                   onClick={() => handleInputChange("exerciseDuration", option)}
@@ -624,7 +805,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 2:
         return (
           <div className="space-y-6">
@@ -633,7 +813,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Jenis Olahraga</h2>
               <p className="text-gray-600">Jenis olahraga hari ini?</p>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               {["Jalan kaki", "Lari", "Sepeda", "Gym", "Yoga", "Tim", "Lainnya"].map((option) => (
                 <button
@@ -651,7 +830,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 3:
         return (
           <div className="space-y-6">
@@ -660,7 +838,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tidur</h2>
               <p className="text-gray-600">Berapa jam kamu tidur semalam?</p>
             </div>
-
             <div className="max-w-md mx-auto">
               <input
                 type="number"
@@ -675,7 +852,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 4:
         return (
           <div className="space-y-6">
@@ -684,7 +860,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Nutrisi & Pola Makan</h2>
               <p className="text-gray-600">Berapa gelas air yang kamu minum hari ini?</p>
             </div>
-
             <div className="max-w-md mx-auto">
               <input
                 type="number"
@@ -698,7 +873,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 5:
         return (
           <div className="space-y-6">
@@ -707,7 +881,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Nutrisi & Pola Makan</h2>
               <p className="text-gray-600">Berapa kali kamu makan makanan olahan atau junk food hari ini?</p>
             </div>
-
             <div className="space-y-3">
               {["0", "1", "2", "3", "4", ">5"].map((option) => (
                 <button
@@ -725,7 +898,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 6:
         return (
           <div className="space-y-6">
@@ -734,10 +906,9 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Mood & Mental Health</h2>
               <p className="text-gray-600">Bagaimana mood kamu secara keseluruhan hari ini?</p>
             </div>
-
             <div className="space-y-4">
               <div className="text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-wrap justify-center gap-2 sm:justify-between items-center">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}
@@ -759,7 +930,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 7:
         return (
           <div className="space-y-6">
@@ -768,10 +938,9 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Mood & Mental Health</h2>
               <p className="text-gray-600">Seberapa stres kamu hari ini?</p>
             </div>
-
             <div className="space-y-4">
               <div className="text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-wrap justify-center gap-2 sm:justify-between items-center">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}
@@ -793,7 +962,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 8:
         return (
           <div className="space-y-6">
@@ -802,7 +970,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Digital Wellbeing</h2>
               <p className="text-gray-600">Berapa jam screen time kamu hari ini?</p>
             </div>
-
             <div className="max-w-md mx-auto">
               <input
                 type="number"
@@ -818,7 +985,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       case 9:
         return (
           <div className="space-y-6">
@@ -827,7 +993,6 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Pemeriksaan Kesehatan</h2>
               <p className="text-gray-600">Apakah kamu tahu tekanan darah terakhirmu?</p>
             </div>
-
             <div className="space-y-4">
               <div className="space-y-3">
                 <button
@@ -840,7 +1005,6 @@ const HealthTrack = () => {
                 >
                   Ya, saya tahu
                 </button>
-
                 <button
                   onClick={() => {
                     handleInputChange("bloodPressureKnown", "no")
@@ -855,7 +1019,6 @@ const HealthTrack = () => {
                   Tidak tahu (Gunakan estimasi 120 mm)
                 </button>
               </div>
-
               {formData.bloodPressureKnown === "yes" && (
                 <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tekanan Darah Sistolik (mmHg)</label>
@@ -873,7 +1036,6 @@ const HealthTrack = () => {
             </div>
           </div>
         )
-
       default:
         return null
     }
@@ -882,7 +1044,6 @@ const HealthTrack = () => {
   return (
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4">
       <div className="w-[90%] max-w-7xl mx-auto">
-        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-gray-700">Progress</span>
@@ -897,16 +1058,10 @@ const HealthTrack = () => {
             ></div>
           </div>
         </div>
-
-        {/* Submission Message */}
         {submissionMessage && (
           <div className="mb-4 p-3 rounded-lg text-center bg-green-100 text-green-700">{submissionMessage}</div>
         )}
-
-        {/* Question Card */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-6">{renderStep()}</div>
-
-        {/* Navigation Buttons */}
         <div className="flex justify-between">
           {currentStep > 1 && (
             <button
@@ -919,7 +1074,6 @@ const HealthTrack = () => {
               Back
             </button>
           )}
-
           <div className="ml-auto">
             {currentStep < totalSteps ? (
               <button

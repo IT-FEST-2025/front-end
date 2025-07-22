@@ -1,8 +1,10 @@
 import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
+import { getProfileImageUrl } from "../../utils/profile-images" // Pastikan path ini benar
 
-const Profile = ({ user = {} }) => {
-  // State untuk form data
+const Profile = ({ user = {}, onUserUpdate }) => {
+  // Tambahkan onUserUpdate prop
+  // State untuk form data, inisialisasi dari prop user
   const [formData, setFormData] = useState({
     username: user?.username || "",
     fullName: user?.fullName || "",
@@ -11,81 +13,19 @@ const Profile = ({ user = {} }) => {
     age: user?.age || "",
     height: user?.height || "",
     weight: user?.weight || "",
-    medicalHistory: user?.medicalHistory || "",
-    isActiveSmoker: user?.isActiveSmoker || "",
+    medicalHistory: user?.chronicDiseases ? user.chronicDiseases.join(", ") : "", // Gunakan chronicDiseases
+    isActiveSmoker: user?.smokingStatus === "aktif" ? "Ya" : "Tidak", // Gunakan smokingStatus
   })
 
-  // Fungsi untuk mengambil data user dari API
-  const fetchUserData = async () => {
-    try {
-      console.log("🔍 Mulai fetch user data...")
-
-      const token = localStorage.getItem("accessToken") // Ubah dari "accessToken" ke "token"
-      console.log("🔑 Token ditemukan:", token ? "Ya" : "Tidak")
-      console.log("🔑 Token value:", token)
-
-      if (!token) {
-        console.error("❌ Token tidak ditemukan di localStorage")
-        return
-      }
-
-      const apiUrl = `${config.apiUserService}/api/me`
-      console.log("🌐 URL API:", apiUrl)
-
-      const response = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      console.log("📡 Response status:", response.status)
-      console.log("📡 Response ok:", response.ok)
-
-      const result = await response.json()
-      console.log("📦 Response data:", result)
-
-      if (response.ok && result.status === "success") {
-        const userData = result.data
-        console.log("✅ User data berhasil diambil:", userData)
-
-        setFormData((prev) => ({
-          ...prev,
-          username: userData.username || "",
-          fullName: userData.fullName || "",
-          email: userData.email || "",
-          gender: userData.gender || "",
-          age: userData.age || "",
-          height: userData.height || "",
-          weight: userData.weight || "",
-          medicalHistory: userData.chronicDiseases ? userData.chronicDiseases.join(", ") : "",
-          isActiveSmoker: userData.smokingStatus === "aktif" ? "Ya" : "Tidak",
-        }))
-
-        console.log("✅ FormData berhasil diupdate")
-      } else {
-        console.error("❌ Gagal mengambil data user:", result.message)
-        console.error("❌ Full response:", result)
-      }
-    } catch (error) {
-      console.error("💥 Error saat mengambil data user:", error)
-      console.error("💥 Error details:", error.message)
-    }
-  }
-
-  // useEffect untuk mengambil data user saat komponen dimount
-  useEffect(() => {
-    fetchUserData()
-  }, [])
-
-  // Use the utility function for initial profile image
-  const [profileImage, setProfileImage] = useState(null)
+  // State untuk URL gambar profil yang ditampilkan, inisialisasi dari prop user
+  const [profileImage, setProfileImage] = useState(
+    user?.profilePicture ? getProfileImageUrl(user.profilePicture) : null,
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   const [showImageViewer, setShowImageViewer] = useState(false)
   const [showImageCropper, setShowImageCropper] = useState(false)
-  const [tempImage, setTempImage] = useState(null)
+  const [tempImage, setTempImage] = useState(null) // Gambar sementara untuk cropping
   const [cropData, setCropData] = useState({
     x: 50,
     y: 50,
@@ -94,12 +34,31 @@ const Profile = ({ user = {} }) => {
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, initialSize: 0 })
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 })
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, initialSize: 0, initialDistance: 0 })
+  const [imageLoaded, setImageLoaded] = useState(false) // Menandakan gambar di cropper sudah dimuat
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 }) // Dimensi gambar asli di cropper
   const fileInputRef = useRef(null)
   const canvasRef = useRef(null)
-  const imageRef = useRef(null)
+  const imageRef = useRef(null) // Referensi ke elemen img di cropper
+
+  // Hapus fungsi fetchUserData dan useEffect terkait
+  // useEffect(() => { fetchUserData() }, [])
+
+  // Perbarui formData dan profileImage saat prop user berubah
+  useEffect(() => {
+    setFormData({
+      username: user?.username || "",
+      fullName: user?.fullName || "",
+      email: user?.email || "",
+      gender: user?.gender || "",
+      age: user?.age || "",
+      height: user?.height || "",
+      weight: user?.weight || "",
+      medicalHistory: user?.chronicDiseases ? user.chronicDiseases.join(", ") : "",
+      isActiveSmoker: user?.smokingStatus === "aktif" ? "Ya" : "Tidak",
+    })
+    setProfileImage(user?.profilePicture ? getProfileImageUrl(user.profilePicture) : null)
+  }, [user]) // Bergantung pada prop user
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -118,7 +77,7 @@ const Profile = ({ user = {} }) => {
       reader.onload = (e) => {
         setTempImage(e.target.result)
         setShowImageCropper(true)
-        setImageLoaded(false)
+        setImageLoaded(false) // Reset imageLoaded state for new image
       }
       reader.readAsDataURL(file)
     }
@@ -153,34 +112,119 @@ const Profile = ({ user = {} }) => {
       cropData.size,
     )
 
-    // Convert to data URL
-    const croppedImage = canvas.toDataURL("image/jpeg", 0.8)
-    setProfileImage(croppedImage)
-    setShowImageCropper(false)
-    setTempImage(null)
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        alert("Gagal memotong gambar.")
+        return
+      }
+
+      setIsLoading(true) // Set loading for upload
+      try {
+        const token = localStorage.getItem("accessToken")
+        if (!token) {
+          alert("Token tidak ditemukan. Silakan login kembali.")
+          setIsLoading(false)
+          return
+        }
+
+        const formData = new FormData()
+        formData.append("image", blob, "profile.jpg") // 'image' adalah nama field dari README
+
+        const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Content-Type diatur secara otomatis oleh fetch saat menggunakan FormData
+          },
+          body: formData,
+        })
+
+        const result = await response.json()
+
+        if (response.ok && result.status === "success") {
+          const newProfileFilename = result.data
+          const newProfileUrl = getProfileImageUrl(newProfileFilename)
+          setProfileImage(newProfileUrl)
+          setShowImageCropper(false)
+          setTempImage(null)
+          setShowSuccessPopup(true) // Tampilkan popup sukses untuk unggah gambar
+
+          // Perbarui state parent
+          if (onUserUpdate) {
+            onUserUpdate({ ...user, profilePicture: newProfileFilename }) // Kirim nama file kembali
+          }
+        } else {
+          console.error("Gagal mengunggah foto profil:", result.message || result.error)
+          alert("Gagal mengunggah foto profil: " + (result.message || "Terjadi kesalahan tidak dikenal"))
+        }
+      } catch (error) {
+        console.error("Error saat mengunggah foto profil:", error)
+        alert("Terjadi kesalahan saat mengunggah gambar.")
+      } finally {
+        setIsLoading(false)
+        setTimeout(() => setShowSuccessPopup(false), 1500)
+      }
+    }, "image/jpeg")
   }
 
   // Handle profile image removal
-  const handleRemoveImage = () => {
-    setProfileImage(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+  const handleRemoveImage = async () => {
+    setIsLoading(true)
+    try {
+      const token = localStorage.getItem("accessToken")
+      if (!token) {
+        alert("Token tidak ditemukan. Silakan login kembali.")
+        setIsLoading(false)
+        return
+      }
+
+      // Panggil endpoint DELETE di backend untuk menghapus foto profil
+      const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
+        method: "DELETE", // Menggunakan metode DELETE
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Meskipun DELETE, tetap sertakan Content-Type
+        },
+      })
+
+      const result = await response.json()
+
+      if (response.ok && result.status === "success") {
+        setProfileImage(null) // Hapus gambar dari state frontend
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "" // Bersihkan input file
+        }
+        setShowSuccessPopup(true) // Tampilkan popup sukses
+        // Perbarui state parent
+        if (onUserUpdate) {
+          onUserUpdate({ ...user, profilePicture: null })
+        }
+      } else {
+        console.error("Gagal menghapus foto profil:", result.message || result.error)
+        alert("Gagal menghapus foto profil: " + (result.message || "Terjadi kesalahan tidak dikenal"))
+      }
+    } catch (error) {
+      console.error("Error saat menghapus foto profil:", error)
+      alert("Terjadi kesalahan saat menghapus gambar.")
+    } finally {
+      setIsLoading(false)
+      setTimeout(() => setShowSuccessPopup(false), 1500)
     }
   }
 
   // Handle image load to get dimensions
   const handleImageLoad = () => {
     if (imageRef.current) {
-      const { width, height } = imageRef.current
-      setImageDimensions({ width, height })
+      const { naturalWidth, naturalHeight } = imageRef.current // Gunakan naturalWidth/Height untuk dimensi asli
+      setImageDimensions({ width: naturalWidth, height: naturalHeight })
       setImageLoaded(true)
 
       // Reset crop to center with appropriate size
-      const maxSize = Math.min(width, height, 300)
-      const initialSize = Math.min(200, maxSize)
+      const maxSize = Math.min(naturalWidth, naturalHeight)
+      const initialSize = Math.min(200, maxSize) // Ukuran awal crop, maks 200px atau ukuran gambar
       setCropData({
-        x: (width - initialSize) / 2,
-        y: (height - initialSize) / 2,
+        x: Math.max(0, (naturalWidth - initialSize) / 2),
+        y: Math.max(0, (naturalHeight - initialSize) / 2),
         size: initialSize,
       })
     }
@@ -333,7 +377,7 @@ const Profile = ({ user = {} }) => {
     setIsLoading(true)
 
     try {
-      const token = localStorage.getItem("accessToken") // Ubah dari "accessToken" ke "token"
+      const token = localStorage.getItem("accessToken")
       if (!token) {
         alert("Token tidak ditemukan. Silakan login kembali.")
         setIsLoading(false)
@@ -341,15 +385,28 @@ const Profile = ({ user = {} }) => {
       }
 
       const updateFields = {
-        age: Number.parseInt(formData.age),
-        gender: formData.gender || "lainnya",
-        height_cm: Number.parseInt(formData.height),
-        weight_kg: Number.parseInt(formData.weight),
+        age: formData.age !== "" ? Number.parseInt(formData.age) : undefined,
+        gender: formData.gender !== "" ? formData.gender : undefined,
+        height_cm: formData.height !== "" ? Number.parseInt(formData.height) : undefined,
+        weight_kg: formData.weight !== "" ? Number.parseInt(formData.weight) : undefined,
         smoking_status: formData.isActiveSmoker === "Ya" ? "aktif" : "tidak aktif",
         chronic_diseases: formData.medicalHistory
           .split(",")
           .map((item) => item.trim())
           .filter((item) => item !== ""),
+        fullName: formData.fullName !== user?.fullName ? formData.fullName : undefined, // Hanya kirim jika berubah
+        email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
+        username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
+      }
+
+      // Filter nilai undefined untuk hanya mengirim bidang yang berubah
+      const filteredUpdateFields = Object.fromEntries(
+        Object.entries(updateFields).filter(([, value]) => value !== undefined),
+      )
+
+      // Penanganan khusus untuk chronic_diseases jika array kosong dan perlu dikirim
+      if (updateFields.chronic_diseases !== undefined && updateFields.chronic_diseases.length === 0) {
+        filteredUpdateFields.chronic_diseases = []
       }
 
       const response = await fetch(`${config.apiUserService}/api/update/profile`, {
@@ -358,16 +415,33 @@ const Profile = ({ user = {} }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ updateFields }),
+        body: JSON.stringify(filteredUpdateFields),
       })
 
       const result = await response.json()
 
-      if (response.ok) {
+      if (response.ok && result.status === "success") {
         setShowSuccessPopup(true)
+        if (onUserUpdate) {
+          // Buat objek user baru dengan bidang yang diperbarui
+          const updatedUser = { ...user }
+          if (filteredUpdateFields.username !== undefined) updatedUser.username = filteredUpdateFields.username
+          if (filteredUpdateFields.fullName !== undefined) updatedUser.fullName = filteredUpdateFields.fullName
+          if (filteredUpdateFields.email !== undefined) updatedUser.email = filteredUpdateFields.email
+          if (filteredUpdateFields.gender !== undefined) updatedUser.gender = filteredUpdateFields.gender
+          if (filteredUpdateFields.age !== undefined) updatedUser.age = filteredUpdateFields.age
+          if (filteredUpdateFields.height_cm !== undefined) updatedUser.height = filteredUpdateFields.height_cm // API menggunakan height_cm, lokal menggunakan height
+          if (filteredUpdateFields.weight_kg !== undefined) updatedUser.weight = filteredUpdateFields.weight_kg // API menggunakan weight_kg, lokal menggunakan weight
+          if (filteredUpdateFields.smoking_status !== undefined)
+            updatedUser.smokingStatus = filteredUpdateFields.smoking_status
+          if (filteredUpdateFields.chronic_diseases !== undefined)
+            updatedUser.chronicDiseases = filteredUpdateFields.chronic_diseases
+
+          onUserUpdate(updatedUser)
+        }
       } else {
-        console.error("Gagal memperbarui profil:", result.message)
-        alert("Gagal menyimpan data ke server.")
+        console.error("Gagal memperbarui profil:", result.message || result.error)
+        alert("Gagal menyimpan data ke server: " + (result.message || "Terjadi kesalahan tidak dikenal"))
       }
     } catch (error) {
       console.error("Error saat menyimpan profil:", error)
@@ -548,7 +622,9 @@ const Profile = ({ user = {} }) => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-2xl font-bold text-gray-600">pp</span>
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-700 text-3xl font-bold uppercase">
+                        {formData.username ? formData.username.charAt(0) : "PP"}
+                      </div>
                     )}
                   </div>
 
@@ -578,7 +654,7 @@ const Profile = ({ user = {} }) => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
                         </button>

@@ -1,5 +1,5 @@
 // navbar di tampilan setelah login
-import { config } from "../../config"
+// import { config } from "../../config"
 import { useState, useEffect, useRef } from "react"
 import { useLocation } from "react-router-dom"
 import { getProfileImageUrl } from "../../utils/profile-images"
@@ -9,43 +9,12 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
   const [isScrolled, setIsScrolled] = useState(true)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false) // For profile dropdown
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false) // For mobile navigation dropdown
-  const [userData, setUserData] = useState(user || {}) // State untuk menyimpan data user dari API
+  // Hapus state userData, karena akan menggunakan prop user
   const dropdownRef = useRef(null)
   const mobileNavRef = useRef(null) // Ref for mobile navigation dropdown
 
-  // Fungsi untuk mengambil data user dari API /api/me
-  const fetchUserData = async () => {
-    try {
-      const token = localStorage.getItem("accessToken")
-      if (!token) {
-        console.error("Token tidak ditemukan di localStorage")
-        return
-      }
-
-      const response = await fetch(`${config.apiUserService}/api/me`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      const result = await response.json()
-
-      if (response.ok && result.status === "success") {
-        setUserData(result.data)
-      } else {
-        console.error("Gagal mengambil data user:", result.message)
-      }
-    } catch (error) {
-      console.error("Error saat mengambil data user:", error)
-    }
-  }
-
-  // useEffect untuk mengambil data user saat komponen dimount
-  useEffect(() => {
-    fetchUserData()
-  }, [])
+  // Hapus fungsi fetchUserData dan useEffect terkait
+  // useEffect(() => { fetchUserData() }, [])
 
   const getCurrentPage = () => {
     switch (location.pathname) {
@@ -112,56 +81,56 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
   const shouldUseRedBackground = isHomePage && isScrolled
 
   const customStyles = `
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
+    
+    @keyframes slideUp {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+      }
     }
-  }
-  
-  @keyframes slideUp {
-    from {
-      opacity: 1;
-      transform: translateY(0) scale(1);
+    
+    @keyframes slideDownRight {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) translateX(10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+      }
     }
-    to {
-      opacity: 0;
-      transform: translateY(-10px) scale(0.95);
+    
+    .mobile-dropdown-enter {
+      animation: slideDown 0.2s ease-out forwards;
     }
-  }
-  
-  @keyframes slideDownRight {
-    from {
-      opacity: 0;
-      transform: translateY(-10px) translateX(10px) scale(0.95);
+    
+    .mobile-dropdown-exit {
+      animation: slideUp 0.15s ease-in forwards;
     }
-    to {
-      opacity: 1;
-      transform: translateY(0) translateX(0) scale(1);
+    
+    .profile-dropdown-enter {
+      animation: slideDownRight 0.25s ease-out forwards;
+      transform-origin: top right;
     }
-  }
-  
-  .mobile-dropdown-enter {
-    animation: slideDown 0.2s ease-out forwards;
-  }
-  
-  .mobile-dropdown-exit {
-    animation: slideUp 0.15s ease-in forwards;
-  }
-  
-  .profile-dropdown-enter {
-    animation: slideDownRight 0.25s ease-out forwards;
-    transform-origin: top right;
-  }
-`
+  `
 
-  // Get the profile image URL using the utility function
-  const profileImgSrc = getProfileImageUrl(userData?.profilePicture)
-  const hasProfilePicture = userData?.profilePicture && userData.profilePicture !== "" // Check if there's an actual image
+  // Gunakan prop user untuk mendapatkan URL gambar profil
+  const profileImgSrc = getProfileImageUrl(user?.profilePicture)
+  const hasProfilePicture = user?.profilePicture && user.profilePicture !== "" // Periksa apakah ada gambar yang sebenarnya
 
   return (
     <>
@@ -381,7 +350,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                         : "text-gray-600 border-2 border-[#ff3131]"
                     }`}
                   >
-                    pp
+                    {user?.username ? user.username.charAt(0) : "PP"} {/* Gunakan user.username */}
                   </div>
                 )}
               </button>
@@ -401,14 +370,14 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                           />
                         ) : (
                           <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden cursor-pointer text-2xl font-bold text-gray-600 flex-shrink-0">
-                            pp
+                            {user?.username ? user.username.charAt(0) : "PP"} {/* Gunakan user.username */}
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
-                            {userData?.username || "Pengguna"}
+                            {user?.username || "Pengguna"} {/* Gunakan user.username */}
                           </p>
-                          <p className="text-sm text-gray-500 truncate">{userData?.email || "user@example.com"}</p>
+                          <p className="text-sm text-gray-500 truncate">{user?.email || "user@example.com"}</p>
                         </div>
                       </div>
                     </div>
