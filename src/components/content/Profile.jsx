@@ -394,7 +394,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
           .split(",")
           .map((item) => item.trim())
           .filter((item) => item !== ""),
-        full_name: formData.fullName !== user?.fullName ? formData.fullName : null, // Hanya kirim jika berubah
+        full_name: formData.fullName || null, // Hanya kirim jika berubah
         // email: formData.email !== user?.email ? formData.email : undefined, // Hanya kirim jika berubah
         // username: formData.username !== user?.username ? formData.username : undefined, // Hanya kirim jika berubah
       }
