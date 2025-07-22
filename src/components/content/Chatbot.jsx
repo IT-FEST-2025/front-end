@@ -1,10 +1,10 @@
-import { config } from "../../config"
+// import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
 import LoadingSpinner from "../ui/loading"
 import { getProfileImageUrl } from "../../utils/profile-images"
 
 // Define the API base URL
-const apiBaseUrl = `${config.apiChatbotService}`
+const apiBaseUrl = "https://api.ayuwoki.my.id/chatbot"
 
 const apiFetch = async (method, endpoint, data = null) => {
   const token = localStorage.getItem("accessToken")

@@ -1,4 +1,4 @@
-import { config } from "../config"
+// import { config } from "../config"
 import { useNavigate } from "react-router-dom"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
@@ -23,7 +23,7 @@ const Login = ({ onLoginSuccess }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(`${config.apiUserService}/api/login`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 // menggabungkan home, symptom, health track, chatbot, profil jadi satu wadah
-import { config } from "../../config"
+// import { config } from "../../config"
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
 import Navbar from "./Navbar"
@@ -38,7 +38,7 @@ const ContentContainer = ({ onLogout }) => {
 
       try {
         // Ambil data pengguna terbaru
-        const response = await fetch(`${config.apiUserService}/api/me`, {
+        const response = await fetch("https://api.ayuwoki.my.id/users/api/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

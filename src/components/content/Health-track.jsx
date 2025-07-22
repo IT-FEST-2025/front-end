@@ -1,4 +1,4 @@
-import { config } from "../../config"
+// import { config } from "../../config"
 import { useState, useEffect, useCallback } from "react"
 import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer, Line, LineChart, CartesianGrid } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../../../components/ui/chart"
@@ -36,7 +36,7 @@ const HealthTrack = () => {
       return
     }
     try {
-      const response = await fetch(`${config.apiUserService}/tracker?range=7d`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/tracker?range=7d", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -295,7 +295,7 @@ const HealthTrack = () => {
     }
 
     try {
-      const response = await fetch(`${config.apiUserService}/tracker`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/tracker", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
