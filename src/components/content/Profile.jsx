@@ -41,6 +41,9 @@ const Profile = ({ user = {}, onUserUpdate }) => {
   const canvasRef = useRef(null)
   const imageRef = useRef(null) // Referensi ke elemen img di cropper
 
+  // Add zoom state after existing state declarations
+  const [imageDisplaySize, setImageDisplaySize] = useState({ width: 0, height: 0 })
+
   // Hapus fungsi fetchUserData dan useEffect terkait
   // useEffect(() => { fetchUserData() }, [])
 
@@ -83,7 +86,121 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     }
   }
 
-  // Handle image cropping
+  // Update handleImageLoad function
+  const handleImageLoad = () => {
+    if (imageRef.current) {
+      const { naturalWidth, naturalHeight } = imageRef.current
+      const containerMaxWidth = 500 // Max display width
+      const containerMaxHeight = 400 // Max display height
+
+      // Calculate display size while maintaining aspect ratio
+      const aspectRatio = naturalWidth / naturalHeight
+      let displayWidth, displayHeight
+
+      if (aspectRatio > containerMaxWidth / containerMaxHeight) {
+        displayWidth = Math.min(containerMaxWidth, naturalWidth)
+        displayHeight = displayWidth / aspectRatio
+      } else {
+        displayHeight = Math.min(containerMaxHeight, naturalHeight)
+        displayWidth = displayHeight * aspectRatio
+      }
+
+      setImageDimensions({ width: naturalWidth, height: naturalHeight })
+      setImageDisplaySize({ width: displayWidth, height: displayHeight })
+      setImageLoaded(true)
+
+      // Reset crop to center with appropriate size
+      const minDimension = Math.min(displayWidth, displayHeight)
+      const initialSize = Math.min(200, minDimension * 0.8)
+      setCropData({
+        x: (displayWidth - initialSize) / 2,
+        y: (displayHeight - initialSize) / 2,
+        size: initialSize,
+      })
+    }
+  }
+
+  // Update handleMouseDown function
+  const handleMouseDown = (e) => {
+    if (!imageLoaded) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const rect = imageRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    // Check if click is on resize handle
+    if (isOnResizeHandle(x, y)) {
+      setIsResizing(true)
+      const centerX = cropData.x + cropData.size / 2
+      const centerY = cropData.y + cropData.size / 2
+      const initialDistance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+
+      setResizeStart({
+        x: centerX,
+        y: centerY,
+        initialSize: cropData.size,
+        initialDistance: initialDistance,
+      })
+    } else if (
+      x >= cropData.x &&
+      x <= cropData.x + cropData.size &&
+      y >= cropData.y &&
+      y <= cropData.y + cropData.size
+    ) {
+      setIsDragging(true)
+      setDragStart({
+        x: x - cropData.x,
+        y: y - cropData.y,
+      })
+    }
+  }
+
+  // Update handleMouseMove function
+  const handleMouseMove = (e) => {
+    if (!imageLoaded || (!isDragging && !isResizing)) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const rect = imageRef.current.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    if (isResizing) {
+      const currentDistance = Math.sqrt(Math.pow(x - resizeStart.x, 2) + Math.pow(y - resizeStart.y, 2))
+      const ratio = currentDistance / resizeStart.initialDistance
+      let newSize = Math.round(resizeStart.initialSize * ratio)
+
+      // Constrain size based on display dimensions
+      const minSize = 50
+      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.9
+      newSize = Math.max(minSize, Math.min(newSize, maxSize))
+
+      // Calculate new position to keep center
+      const newX = Math.max(0, Math.min(resizeStart.x - newSize / 2, imageDisplaySize.width - newSize))
+      const newY = Math.max(0, Math.min(resizeStart.y - newSize / 2, imageDisplaySize.height - newSize))
+
+      setCropData({
+        x: newX,
+        y: newY,
+        size: newSize,
+      })
+    } else if (isDragging) {
+      const newX = Math.max(0, Math.min(x - dragStart.x, imageDisplaySize.width - cropData.size))
+      const newY = Math.max(0, Math.min(y - dragStart.y, imageDisplaySize.height - cropData.size))
+
+      setCropData((prev) => ({
+        ...prev,
+        x: newX,
+        y: newY,
+      }))
+    }
+  }
+
+  // Update handleCropImage function to work with zoom
   const handleCropImage = () => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext("2d")
@@ -92,79 +209,77 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     if (!image || !canvas) return
 
     // Set canvas size to square
-    canvas.width = cropData.size
-    canvas.height = cropData.size
+    const outputSize = 400 // Output image size
+    canvas.width = outputSize
+    canvas.height = outputSize
 
-    // Calculate crop dimensions
-    const scaleX = image.naturalWidth / image.width
-    const scaleY = image.naturalHeight / image.height
+    // Calculate scaling factors
+    const scaleX = imageDimensions.width / imageDisplaySize.width
+    const scaleY = imageDimensions.height / imageDisplaySize.height
+
+    // Calculate crop area in original image coordinates
+    const cropX = cropData.x * scaleX
+    const cropY = cropData.y * scaleY
+    const cropSize = cropData.size * scaleX
 
     // Draw cropped image
-    ctx.drawImage(
-      image,
-      cropData.x * scaleX,
-      cropData.y * scaleY,
-      cropData.size * scaleX,
-      cropData.size * scaleY,
-      0,
-      0,
-      cropData.size,
-      cropData.size,
-    )
+    ctx.drawImage(image, cropX, cropY, cropSize, cropSize, 0, 0, outputSize, outputSize)
 
-    canvas.toBlob(async (blob) => {
-      if (!blob) {
-        alert("Gagal memotong gambar.")
-        return
-      }
-
-      setIsLoading(true) // Set loading for upload
-      try {
-        const token = localStorage.getItem("accessToken")
-        if (!token) {
-          alert("Token tidak ditemukan. Silakan login kembali.")
-          setIsLoading(false)
+    canvas.toBlob(
+      async (blob) => {
+        if (!blob) {
+          alert("Gagal memotong gambar.")
           return
         }
 
-        const formData = new FormData()
-        formData.append("image", blob, "profile.jpg") // 'image' adalah nama field dari README
-
-        const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Content-Type diatur secara otomatis oleh fetch saat menggunakan FormData
-          },
-          body: formData,
-        })
-
-        const result = await response.json()
-
-        if (response.ok && result.status === "success") {
-          const newProfileFilename = result.data
-          const newProfileUrl = getProfileImageUrl(newProfileFilename)
-          setProfileImage(newProfileUrl)
-          setShowImageCropper(false)
-          setTempImage(null)
-          setShowSuccessPopup(true) // Tampilkan popup sukses untuk unggah gambar
-
-          // Perbarui state parent
-          if (onUserUpdate) {
-            onUserUpdate({ ...user, profilePicture: newProfileFilename }) // Kirim nama file kembali
+        setIsLoading(true)
+        try {
+          const token = localStorage.getItem("accessToken")
+          if (!token) {
+            alert("Token tidak ditemukan. Silakan login kembali.")
+            setIsLoading(false)
+            return
           }
-        } else {
-          console.error("Gagal mengunggah foto profil:", result.message || result.error)
-          alert("Gagal mengunggah foto profil: " + (result.message || "Terjadi kesalahan tidak dikenal"))
+
+          const formData = new FormData()
+          formData.append("image", blob, "profile.jpg")
+
+          const response = await fetch(`${config.apiUserService}/api/photoprofile`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          })
+
+          const result = await response.json()
+
+          if (response.ok && result.status === "success") {
+            const newProfileFilename = result.data
+            const newProfileUrl = getProfileImageUrl(newProfileFilename)
+            setProfileImage(newProfileUrl)
+            setShowImageCropper(false)
+            setTempImage(null)
+            setShowSuccessPopup(true)
+
+            if (onUserUpdate) {
+              onUserUpdate({ ...user, profilePicture: newProfileFilename })
+            }
+          } else {
+            console.error("Gagal mengunggah foto profil:", result.message || result.error)
+            alert("Gagal mengunggah foto profil: " + (result.message || "Terjadi kesalahan tidak dikenal"))
+          }
+        } catch (error) {
+          console.error("Error saat mengunggah foto profil:", error)
+          alert("Terjadi kesalahan saat mengunggah gambar.")
+        } finally {
+          setIsLoading(false)
+          setTimeout(() => setShowSuccessPopup(false), 1500)
         }
-      } catch (error) {
-        console.error("Error saat mengunggah foto profil:", error)
-        alert("Terjadi kesalahan saat mengunggah gambar.")
-      } finally {
-        setIsLoading(false)
-        setTimeout(() => setShowSuccessPopup(false), 1500)
-      }
-    }, "image/jpeg")
+      },
+      "image/jpeg",
+      0.9,
+    )
   }
 
   // Handle profile image removal
@@ -212,24 +327,6 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     }
   }
 
-  // Handle image load to get dimensions
-  const handleImageLoad = () => {
-    if (imageRef.current) {
-      const { naturalWidth, naturalHeight } = imageRef.current // Gunakan naturalWidth/Height untuk dimensi asli
-      setImageDimensions({ width: naturalWidth, height: naturalHeight })
-      setImageLoaded(true)
-
-      // Reset crop to center with appropriate size
-      const maxSize = Math.min(naturalWidth, naturalHeight)
-      const initialSize = Math.min(200, maxSize) // Ukuran awal crop, maks 200px atau ukuran gambar
-      setCropData({
-        x: Math.max(0, (naturalWidth - initialSize) / 2),
-        y: Math.max(0, (naturalHeight - initialSize) / 2),
-        size: initialSize,
-      })
-    }
-  }
-
   // Check if click is on resize handle
   const isOnResizeHandle = (x, y) => {
     const handleSize = 10
@@ -256,89 +353,6 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     }
 
     return false
-  }
-
-  // Handle mouse down for dragging or resizing
-  const handleMouseDown = (e) => {
-    if (!imageLoaded) return
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    const rect = imageRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    // Check if click is on resize handle
-    if (isOnResizeHandle(x, y)) {
-      setIsResizing(true)
-      const centerX = cropData.x + cropData.size / 2
-      const centerY = cropData.y + cropData.size / 2
-      const initialDistance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
-
-      setResizeStart({
-        x: centerX,
-        y: centerY,
-        initialSize: cropData.size,
-        initialDistance: initialDistance,
-      })
-    } else if (
-      x >= cropData.x &&
-      x <= cropData.x + cropData.size &&
-      y >= cropData.y &&
-      y <= cropData.y + cropData.size
-    ) {
-      // Click is inside crop area for dragging
-      setIsDragging(true)
-      setDragStart({
-        x: x - cropData.x,
-        y: y - cropData.y,
-      })
-    }
-  }
-
-  // Handle mouse move for dragging or resizing
-  const handleMouseMove = (e) => {
-    if (!imageLoaded || (!isDragging && !isResizing)) return
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    const rect = imageRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    if (isResizing) {
-      // Calculate new size based on distance from center
-      const currentDistance = Math.sqrt(Math.pow(x - resizeStart.x, 2) + Math.pow(y - resizeStart.y, 2))
-      const ratio = currentDistance / resizeStart.initialDistance
-      let newSize = Math.round(resizeStart.initialSize * ratio)
-
-      // Constrain size
-      const minSize = 50
-      const maxSize = Math.min(imageDimensions.width, imageDimensions.height)
-      newSize = Math.max(minSize, Math.min(newSize, maxSize))
-
-      // Calculate new position to keep center
-      const newX = Math.max(0, Math.min(resizeStart.x - newSize / 2, imageDimensions.width - newSize))
-      const newY = Math.max(0, Math.min(resizeStart.y - newSize / 2, imageDimensions.height - newSize))
-
-      setCropData({
-        x: newX,
-        y: newY,
-        size: newSize,
-      })
-    } else if (isDragging) {
-      // Handle dragging
-      const newX = Math.max(0, Math.min(x - dragStart.x, imageDimensions.width - cropData.size))
-      const newY = Math.max(0, Math.min(y - dragStart.y, imageDimensions.height - cropData.size))
-
-      setCropData((prev) => ({
-        ...prev,
-        x: newX,
-        y: newY,
-      }))
-    }
   }
 
   // Handle mouse up
@@ -415,10 +429,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({updateFields : filteredUpdateFields}),
+        body: JSON.stringify({ updateFields: filteredUpdateFields }),
       })
 
-      console.log({updateFields : filteredUpdateFields})
+      console.log({ updateFields: filteredUpdateFields })
 
       const result = await response.json()
 
@@ -505,7 +519,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
           className="fixed inset-0 flex items-center justify-center z-50 p-4"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
         >
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-full overflow-auto">
+          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-full overflow-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Sesuaikan Foto Profil</h3>
               <button
@@ -524,54 +538,62 @@ const Profile = ({ user = {}, onUserUpdate }) => {
 
             <div className="space-y-4">
               {/* Image with crop overlay */}
-              <div
-                className="relative inline-block select-none"
-                onMouseMove={(e) => {
-                  handleMouseMove(e)
-                  e.currentTarget.style.cursor = getCursorStyle(e)
-                }}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                style={{ cursor: "default" }}
-              >
-                <img
-                  ref={imageRef}
-                  src={tempImage || "/placeholder.svg"} // tempImage is the one being cropped
-                  alt="Crop preview"
-                  className="max-w-full h-auto block"
-                  style={{ maxHeight: "400px" }}
-                  onLoad={handleImageLoad}
-                  onMouseDown={handleMouseDown}
-                  draggable={false}
-                />
-                {/* Crop overlay - Square with red border only */}
-                {imageLoaded && (
-                  <div
-                    className="absolute border-2 border-red-500 pointer-events-none"
+              <div className="flex justify-center">
+                <div
+                  className="relative inline-block select-none"
+                  onMouseMove={(e) => {
+                    handleMouseMove(e)
+                    e.currentTarget.style.cursor = getCursorStyle(e)
+                  }}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseUp}
+                  style={{ cursor: "default" }}
+                >
+                  <img
+                    ref={imageRef}
+                    src={tempImage || "/placeholder.svg"}
+                    alt="Crop preview"
+                    className="block"
                     style={{
-                      left: cropData.x,
-                      top: cropData.y,
-                      width: cropData.size,
-                      height: cropData.size,
-                      backgroundColor: "transparent",
+                      width: imageDisplaySize.width,
+                      height: imageDisplaySize.height,
+                      maxWidth: "none",
+                      maxHeight: "500px",
+                      objectFit: "contain",
                     }}
-                  >
-                    {/* Resize handles at corners */}
-                    <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-nw-resize"></div>
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-ne-resize"></div>
-                    <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-sw-resize"></div>
-                    <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-se-resize"></div>
-                  </div>
-                )}
+                    onLoad={handleImageLoad}
+                    onMouseDown={handleMouseDown}
+                    draggable={false}
+                  />
+                  {/* Crop overlay */}
+                  {imageLoaded && (
+                    <div
+                      className="absolute border-2 border-red-500 pointer-events-none"
+                      style={{
+                        left: cropData.x,
+                        top: cropData.y,
+                        width: cropData.size,
+                        height: cropData.size,
+                        backgroundColor: "transparent",
+                      }}
+                    >
+                      {/* Resize handles */}
+                      <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-nw-resize"></div>
+                      <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-ne-resize"></div>
+                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-sw-resize"></div>
+                      <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-se-resize"></div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Instructions only */}
+              {/* Instructions */}
               {imageLoaded && (
                 <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
                   <p className="font-medium mb-1">Cara menggunakan:</p>
                   <ul className="text-xs space-y-1">
                     <li>• Klik dan seret kotak merah untuk memindahkan area crop</li>
-                    <li>• Seret sudut kotak merah untuk mengubah ukuran</li>
+                    <li>• Seret sudut kotak merah untuk mengubah ukuran area crop</li>
                   </ul>
                 </div>
               )}
@@ -590,10 +612,31 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                 </button>
                 <button
                   onClick={handleCropImage}
-                  disabled={!imageLoaded}
-                  className="px-4 py-2 bg-[#ff3131] text-white rounded-lg hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled={!imageLoaded || isLoading}
+                  className="px-4 py-2 bg-[#ff3131] text-white rounded-lg hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
                 >
-                  Gunakan Foto
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 4 9.018C14.865 18.072 18 15.189 18 12a8 8 0 01-8-8z"
+                        ></path>
+                      </svg>
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <span>Gunakan Foto</span>
+                  )}
                 </button>
               </div>
             </div>
@@ -605,7 +648,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="pt-20 pb-8 px-4">
-        <div className="max-w-[76rem] mx-auto">
+        <div className="max-w-6xl mx-auto">
           <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-8 space-y-6">
             {/* Profile Picture Section dengan Username dan Full Name */}
             <div className="space-y-4">
