@@ -3,9 +3,9 @@ import { useState, useEffect } from "react"
 
 const Symptom = () => {
   const [query, setQuery] = useState("")
-  const [symptoms, setSymptoms] = useState([]) // Will store objects with both English and Indonesian
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]) // Will store English values for API
-  const [selectedSymptomsDisplay, setSelectedSymptomsDisplay] = useState([]) // Will store Indonesian for display
+  const [symptoms, setSymptoms] = useState([])
+  const [selectedSymptoms, setSelectedSymptoms] = useState([])
+  const [selectedSymptomsDisplay, setSelectedSymptomsDisplay] = useState([])
   const [prediction, setPrediction] = useState(null)
   const [loading, setLoading] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
