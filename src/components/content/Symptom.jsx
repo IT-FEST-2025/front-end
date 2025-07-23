@@ -22,7 +22,7 @@ const Symptom = () => {
 
       setSearchLoading(true)
       try {
-        const response = await fetch(`${config.apiSymtomService}/symptom?q=${query}`)
+        const response = await fetch(`${config.apiSymptomService}/symptom?q=${query}`)
         const data = await response.json()
         console.log("Response GET symptoms:", data)
 
@@ -105,7 +105,7 @@ const Symptom = () => {
     setError(null)
 
     try {
-      const response = await fetch(`${config.apiSymtomService}/predict`, {
+      const response = await fetch(`${config.apiSymptomService}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ symptoms: selectedSymptoms }), // Send English values
