@@ -5,14 +5,14 @@ import { useState, useEffect } from "react"
 import AuthContainer from "./components/auth-container"
 import ContentContainer from "./components/content/content-container"
 
-// Wrapper component to access navigate and location
+// Wrapper komponen untuk akses navigasi dan lokasi
 function AppContent() {
   const navigate = useNavigate()
   const location = useLocation()
   const [isAuthenticated, setIsAuthenticated] = useState(null) // null = loading
   const [isLoading, setIsLoading] = useState(true)
 
-  // Centralized authentication check
+  // autentikasi cek
   const checkAuthentication = async () => {
     const token = localStorage.getItem("accessToken")
 
@@ -23,7 +23,7 @@ function AppContent() {
     }
 
     try {
-      // Verify token validity
+      // verifikasi token validasi
       const response = await fetch(`${config.apiUserService}/api/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -33,7 +33,7 @@ function AppContent() {
       if (response.ok) {
         setIsAuthenticated(true)
       } else {
-        // Token invalid, remove it
+        // token invalid
         localStorage.removeItem("accessToken")
         localStorage.removeItem("user")
         setIsAuthenticated(false)

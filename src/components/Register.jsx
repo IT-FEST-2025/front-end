@@ -4,6 +4,8 @@ import { validationRules } from "../utils/validasi"
 import Layout from "./layout/layout"
 import FormInput from "./ui/form-input"
 import SubmitButton from "./ui/submit-button"
+import { useNotification } from "../hooks/notification"
+import { Notification } from "./ui/notification"
 
 // Add onNavigateToHome prop to the component
 const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
@@ -16,12 +18,13 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
 
   const validation = {
     email: [validationRules.required, validationRules.email],
-    password: [validationRules.required, validationRules.minLength(6)],
-    username: [validationRules.required, validationRules.minLength(3)],
-    fullName: [validationRules.required, validationRules.minLength(2)],
+    password: [validationRules.required, validationRules.minLength(1)],
+    username: [validationRules.required, validationRules.minLength(1)],
+    fullName: [validationRules.required, validationRules.minLength(1)],
   }
 
   const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation)
+  const { notificationMessage, notificationType, showNotification, clearNotification } = useNotification()
 
   const onSubmit = async (data) => {
     try {
@@ -39,9 +42,16 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
         throw new Error(result.message || "Registrasi gagal")
       }
 
-      if (onNavigateToLogin) onNavigateToLogin()
+      // if (onNavigateToLogin) onNavigateToLogin() // Hapus ini
+      if (onNavigateToLogin) {
+        // Tambahkan ini
+        onNavigateToLogin({ message: "Registrasi berhasil! Silakan login.", type: "success" })
+      } else {
+        console.log("Navigate to Login with success message")
+      }
     } catch (err) {
-      alert("Gagal registrasi: " + err.message)
+      // alert("Gagal registrasi: " + err.message)
+      showNotification("Gagal registrasi: " + err.message, "error")
     }
   }
 
@@ -60,6 +70,7 @@ const Register = ({ onNavigateToLogin, onNavigateToHome }) => {
 
   return (
     <Layout title="Registrasi" onBack={onNavigateToHome}>
+      <Notification message={notificationMessage} type={notificationType} onClose={clearNotification} />
       <form onSubmit={handleFormSubmit} className="space-y-2 sm:space-y-3" noValidate>
         <FormInput
           id="email"

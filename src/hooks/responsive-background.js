@@ -10,7 +10,7 @@ export const useResponsiveBackground = (basePath = "/assets/Register") => {
       const width = window.innerWidth
 
       if (width < 640) {
-        setBackgroundImage(`${basePath}-hp.png`)
+        setBackgroundImage(`${basePath}-hpp.png`)
       } else if (width < 1024) {
         setBackgroundImage(`${basePath}-hp.png`)
       } else {

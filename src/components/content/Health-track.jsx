@@ -69,42 +69,28 @@ const HealthTrack = () => {
 
       const analysisResult = await analysisResponse.json()
 
-      if (analysisResult.status === "success" && analysisResult.data?.analysis) {
+      if (analysisResult.status === "success" && analysisResult.data) {
         setHasData(true)
         setAnalysisData(analysisResult.data.analysis)
 
-        // Create chart data based on available information
-        const currentScore = analysisResult.data.analysis.diagnifyScore
-        const totalDays = analysisResult.data.analysis.analysis.totalDays
+        // Use dailyDiagnifyScore from the backend for the line chart
+        const dailyScores = analysisResult.data.dailyDiagnifyScore
 
-        // Generate realistic historical data based on current score and total days
-        const chartData = []
-        const today = new Date()
-
-        for (let i = totalDays - 1; i >= 0; i--) {
-          const date = new Date(today)
-          date.setDate(date.getDate() - i)
-
-          // For the first entry (when user just filled the form), use the exact diagnify score
-          // For other days, create some variation around the current score
-          let dayScore
-          if (i === 0 && totalDays === 1) {
-            // First time user - use exact diagnify score
-            dayScore = currentScore
-          } else {
-            // Create some variation around the current score for historical data
-            const variation = (Math.random() - 0.5) * 10 // ±5 points variation
-            dayScore = Math.max(0, Math.min(100, currentScore + variation))
-          }
-
-          chartData.push({
-            day: date.toLocaleDateString("id-ID", { weekday: "short", day: "numeric" }),
-            date: date.toISOString().split("T")[0],
-            score: Math.round(dayScore),
+        if (dailyScores && dailyScores.length > 0) {
+          const chartData = dailyScores.map((item) => {
+            const date = new Date(item.record_date)
+            // Format date to "DD Mon" for better readability on X-axis
+            const formattedDate = date.toLocaleDateString("id-ID", { day: "numeric", month: "short" })
+            return {
+              day: formattedDate, // Use formatted date for X-axis label
+              date: item.record_date, // Keep original date if needed elsewhere
+              score: Math.round(item.diagnifyScore), // Use actual diagnifyScore
+            }
           })
+          setWeeklyData(chartData)
+        } else {
+          setWeeklyData([]) // No daily scores available
         }
-
-        setWeeklyData(chartData)
       } else {
         // No data available, but don't throw error - show empty state
         console.log("No analysis data in response, showing empty state")
@@ -189,6 +175,21 @@ const HealthTrack = () => {
         if (response.status === 401) {
           throw new Error("Sesi telah berakhir. Silakan login kembali.")
         }
+        // Check for duplicate entry error
+        if (
+          errorData.message &&
+          errorData.message.includes(
+            'new row for relation "health_records" violates check constraint "health_records_blood_pressure_check"',
+          )
+        ) {
+          throw new Error("Anda sudah mengisi Health Track hari ini. Silakan coba lagi besok.")
+        } else if (
+          errorData.message &&
+          (errorData.message.includes("duplicate") || errorData.message.includes("sudah ada"))
+        ) {
+          // Keep the previous duplicate check for other potential duplicate errors
+          throw new Error("Anda sudah mengisi Health Track hari ini. Silakan coba lagi besok.")
+        }
         throw new Error(errorData.message || "Gagal menyimpan data kesehatan")
       }
 
@@ -258,7 +259,6 @@ const HealthTrack = () => {
                 { label: "Gym", value: "gym" },
                 { label: "Yoga", value: "yoga" },
                 { label: "Olahraga Tim", value: "tim" },
-                { label: "Lainnya", value: "lainnya" },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -272,6 +272,18 @@ const HealthTrack = () => {
                   {option.label}
                 </button>
               ))}
+            </div>
+            <div className="w-full">
+              <button
+                onClick={() => handleInputChange("exercise_type", "lainnya")}
+                className={`w-full p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
+                  formData.exercise_type === "lainnya"
+                    ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                Lainnya
+              </button>
             </div>
           </div>
         )
@@ -416,27 +428,17 @@ const HealthTrack = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Screen Time</h2>
               <p className="text-gray-600">Berapa jam screen time kamu hari ini?</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { label: "0 jam", value: "0" },
-                { label: "1-2 jam", value: "1.5" },
-                { label: "3-4 jam", value: "3.5" },
-                { label: "5-6 jam", value: "5.5" },
-                { label: "7-8 jam", value: "7.5" },
-                { label: "Lebih dari 8 jam", value: "10" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleInputChange("screen_time_hours", option.value)}
-                  className={`p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
-                    formData.screen_time_hours === option.value
-                      ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="max-w-md mx-auto">
+              <input
+                type="number"
+                value={formData.screen_time_hours}
+                onChange={(e) => handleInputChange("screen_time_hours", e.target.value)}
+                placeholder="Masukkan jumlah jam"
+                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none h-16"
+                min="0"
+                step="0.5"
+              />
+              <p className="text-center text-gray-500 mt-2">jam</p>
             </div>
           </div>
         )
@@ -446,29 +448,19 @@ const HealthTrack = () => {
             <div className="text-center mb-8">
               <div className="text-4xl mb-4">🩺</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tekanan Darah</h2>
-              <p className="text-gray-600">Pilih rentang tekanan darah sistolik Anda</p>
+              <p className="text-gray-600">Masukkan tekanan darah sistolik Anda (misal: 120)</p>
+              <p className="text-gray-600">Disclaimer: Kosongkan saja jika tidak tahu</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                { label: "90-100 mmHg (Normal)", value: "95" },
-                { label: "101-110 mmHg (Normal)", value: "105" },
-                { label: "111-120 mmHg (Normal)", value: "115" },
-                { label: "121-130 mmHg (Tinggi)", value: "125" },
-                { label: "131-140 mmHg (Tinggi)", value: "135" },
-                { label: "Lebih dari 140 mmHg", value: "145" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleInputChange("blood_pressure", option.value)}
-                  className={`p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
-                    formData.blood_pressure === option.value
-                      ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="max-w-md mx-auto">
+              <input
+                type="number"
+                value={formData.blood_pressure}
+                onChange={(e) => handleInputChange("blood_pressure", e.target.value)}
+                placeholder="Masukkan tekanan darah"
+                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none h-16"
+                min="0"
+              />
+              <p className="text-center text-gray-500 mt-2">mmHg</p>
             </div>
           </div>
         )
@@ -477,66 +469,161 @@ const HealthTrack = () => {
     }
   }
 
-  // Generate daily health categories data for bar chart with 0-20 scale
+  // Define max scores for each category as per TrackerService.js's calculateDiagnifyScore
+  const categoryMaxScores = {
+    Tidur: 20,
+    Olahraga: 15,
+    Hidrasi: 10,
+    "Pola Makan": 10, // Corresponds to Diet
+    Mental: 15, // Corresponds to Overall Mood
+    Stress: 10, // Corresponds to Stress Level
+    Screen: 10, // Corresponds to Screen Time
+    Tekanan: 10, // Corresponds to Blood Pressure
+  }
+
+  // Helper function to calculate individual category scores based on averages
+  const calculateIndividualCategoryScores = (averages) => {
+    let sleepScore = 0
+    if (averages.sleepHours >= 7 && averages.sleepHours <= 9) {
+      sleepScore = 20
+    } else if (averages.sleepHours >= 6 && averages.sleepHours < 7) {
+      sleepScore = 15
+    } else if (averages.sleepHours >= 5 && averages.sleepHours < 6) {
+      sleepScore = 10
+    } else {
+      sleepScore = 5
+    }
+
+    let exerciseScore = 0
+    if (averages.exerciseMinutes >= 30) {
+      exerciseScore = 15
+    } else if (averages.exerciseMinutes >= 20) {
+      exerciseScore = 12
+    } else if (averages.exerciseMinutes >= 10) {
+      exerciseScore = 8
+    } else if (averages.exerciseMinutes > 0) {
+      exerciseScore = 5
+    }
+
+    let waterScore = 0
+    if (averages.waterGlasses >= 8) {
+      waterScore = 10
+    } else if (averages.waterGlasses >= 6) {
+      waterScore = 8
+    } else if (averages.waterGlasses >= 4) {
+      waterScore = 6
+    } else {
+      waterScore = 3
+    }
+
+    let junkFoodScore = 0
+    if (averages.junkFoodCount <= 1) {
+      junkFoodScore = 10
+    } else if (averages.junkFoodCount <= 3) {
+      junkFoodScore = 7
+    } else if (averages.junkFoodCount <= 5) {
+      junkFoodScore = 4
+    } else {
+      junkFoodScore = 1
+    }
+
+    let moodScore = 0
+    if (averages.overallMood >= 4) {
+      moodScore = 15
+    } else if (averages.overallMood >= 3) {
+      moodScore = 12
+    } else if (averages.overallMood >= 2) {
+      moodScore = 8
+    } else {
+      moodScore = 5
+    }
+
+    let stressScore = 0
+    if (averages.stressLevel <= 2) {
+      stressScore = 10
+    } else if (averages.stressLevel <= 3) {
+      stressScore = 8
+    } else if (averages.stressLevel <= 4) {
+      stressScore = 5
+    } else {
+      stressScore = 2
+    }
+
+    let screenTimeScore = 0
+    if (averages.screenTimeHours <= 6) {
+      screenTimeScore = 10
+    } else if (averages.screenTimeHours <= 8) {
+      screenTimeScore = 8
+    } else if (averages.screenTimeHours <= 12) {
+      screenTimeScore = 5
+    } else {
+      screenTimeScore = 2
+    }
+
+    let bloodPressureScore = 0
+    // Logic based on TrackerService.js interpretation, prioritizing normal range
+    if (averages.bloodPressure >= 90 && averages.bloodPressure <= 120) {
+      bloodPressureScore = 10 // Normal
+    } else if (averages.bloodPressure > 120 && averages.bloodPressure < 130) {
+      bloodPressureScore = 7 // Elevated (closer to normal)
+    } else if (averages.bloodPressure >= 130 && averages.bloodPressure < 140) {
+      bloodPressureScore = 6 // Stage 1 Hypertension
+    } else if (averages.bloodPressure >= 140 && averages.bloodPressure < 180) {
+      bloodPressureScore = 4 // Stage 2 Hypertension
+    } else if (averages.bloodPressure >= 180) {
+      bloodPressureScore = 1 // Hypertensive Crisis (lowest score)
+    } else if (averages.bloodPressure < 90 && averages.bloodPressure >= 50) {
+      bloodPressureScore = 5 // Low blood pressure (not ideal, but not as critical as very high)
+    } else if (averages.bloodPressure < 50) {
+      bloodPressureScore = 2 // Very low blood pressure
+    } else {
+      bloodPressureScore = 0 // Fallback for unexpected values
+    }
+
+    return {
+      sleep: sleepScore,
+      exercise: exerciseScore,
+      hydration: waterScore,
+      diet: junkFoodScore,
+      mental: moodScore,
+      stress: stressScore,
+      screenTime: screenTimeScore,
+      bloodPressure: bloodPressureScore,
+    }
+  }
+
+  // Generate daily health categories data for bar chart
   const getDailyChartData = () => {
-    if (!hasData || !analysisData?.healthCategories) {
+    if (!hasData || !analysisData?.healthCategories || !analysisData?.analysis?.averages) {
       // Return empty data structure for no data state
       return [
         { name: "Tidur", shortName: "Tidur", score: 0, status: "-", fill: "#8884d8" },
         { name: "Olahraga", shortName: "Olahraga", score: 0, status: "-", fill: "#82ca9d" },
         { name: "Hidrasi", shortName: "Hidrasi", score: 0, status: "-", fill: "#ffc658" },
         { name: "Mental", shortName: "Mental", score: 0, status: "-", fill: "#ff7300" },
-        { name: "Diet", shortName: "Pola Makan", score: 0, status: "-", fill: "#00ff00" },
+        { name: "Diet", shortName: "Diet", score: 0, status: "-", fill: "#00ff00" },
+        { name: "Stress", shortName: "Stress", score: 0, status: "-", fill: "#ff00ff" },
         { name: "Screen Time", shortName: "Screen", score: 0, status: "-", fill: "#ff0000" },
         { name: "Tekanan Darah", shortName: "Tekanan", score: 0, status: "-", fill: "#8dd1e1" },
       ]
     }
+
+    const individualScores = calculateIndividualCategoryScores(analysisData.analysis.averages)
 
     const categories = [
       { name: "Tidur", shortName: "Tidur", category: "sleep", color: "#8884d8" },
       { name: "Olahraga", shortName: "Olahraga", category: "exercise", color: "#82ca9d" },
       { name: "Hidrasi", shortName: "Hidrasi", category: "hydration", color: "#ffc658" },
       { name: "Mental", shortName: "Mental", category: "mental", color: "#ff7300" },
-      { name: "Diet", shortName: "Pola Makan", category: "diet", color: "#00ff00" },
-      { name: "Screen Time", shortName: "Screen", category: "screenTime", color: "#ff0000" },
+      { name: "Pola Makan", shortName: "Pola Makan", category: "diet", color: "#00ff00" },
+      { name: "Stres", shortName: "Stres", category: "stress", color: "#ff00ff" },
+      { name: "Waktu Layar", shortName: "Waktu Layar", category: "screenTime", color: "#ff0000" },
       { name: "Tekanan Darah", shortName: "Tekanan", category: "bloodPressure", color: "#8dd1e1" },
     ]
 
     return categories.map((cat) => {
       const status = analysisData.healthCategories[cat.category]
-      let score = 0
-
-      // Convert status to score for visualization (0-20 scale to match TrackerService.js)
-      switch (status) {
-        case "Sangat Baik":
-        case "Baik":
-        case "Aktif":
-        case "Terhidrasi":
-        case "Sehat":
-        case "Normal":
-        case "Rendah":
-          score = 20
-          break
-        case "Cukup":
-        case "Sedang":
-          score = 14
-          break
-        case "Kurang":
-        case "Kurang Aktif":
-        case "Dehidrasi":
-        case "Tidak Sehat":
-        case "Buruk":
-        case "Tinggi":
-        case "Berlebihan":
-          score = 8
-          break
-        case "Sangat Buruk":
-        case "Berbahaya":
-          score = 4
-          break
-        default:
-          score = 10
-      }
+      const score = individualScores[cat.category] // Use the actual calculated score
 
       return {
         name: cat.name,
@@ -553,8 +640,8 @@ const HealthTrack = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{`Hari: ${label}`}</p>
-          <p className="text-[#ff3131]">{`Diagnify Score: ${payload[0].value}/100`}</p>
+          <p className="font-medium text-gray-900">{`${label}`}</p>
+          <p className="text-[#ff3131]">{`Skor Harianmu: ${payload[0].value}/100`}</p>
         </div>
       )
     }
@@ -564,11 +651,13 @@ const HealthTrack = () => {
   // Custom tooltip for bar chart
   const BarTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
+      const categoryName = payload[0].payload.name
+      const maxScore = categoryMaxScores[payload[0].payload.shortName] || 20 // Use shortName for lookup, default to 20
       return (
         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{`${payload[0].payload.name}`}</p>
+          <p className="font-medium text-gray-900">{`${categoryName}`}</p>
           <p className="text-gray-700">{`Status: ${payload[0].payload.status}`}</p>
-          <p className="text-blue-600">{`Skor: ${payload[0].value}/20`}</p>
+          <p className="text-blue-600">{`Skor: ${payload[0].value}/${maxScore}`}</p>
         </div>
       )
     }
@@ -612,7 +701,7 @@ const HealthTrack = () => {
                 setIsStarted(false)
                 setError(null)
               }}
-              className="bg-[#ff3131] hover:bg-red-600 text-white px-6 py-2 rounded-lg"
+              className="bg-[#ff3131] hover:bg-red-600 text-white px-6 py-2 rounded-lg font-medium transition-colors h-12 min-w-[200px]"
             >
               Kembali
             </button>
@@ -627,7 +716,7 @@ const HealthTrack = () => {
     return (
       <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4">
         <div className="w-[96%] max-w-8xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white rounded-xl cursor-default shadow-lg p-8">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Analisis Kesehatan Anda</h1>
               <p className="text-gray-600">
@@ -642,7 +731,7 @@ const HealthTrack = () => {
                   {hasData && analysisData ? `${analysisData.diagnifyScore}/100` : "-/100"}
                 </div>
                 <div className="text-xl">
-                  Diagnify Score ({hasData && analysisData ? analysisData.scoreCategory : "Belum Ada Data"})
+                  Skor rata-ratamu ({hasData && analysisData ? analysisData.scoreCategory : "Belum Ada Data"})
                 </div>
               </div>
             </div>
@@ -650,23 +739,24 @@ const HealthTrack = () => {
             {/* Weekly Trend Chart */}
             <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                Tren Skor Kesehatan {hasData && weeklyData.length > 0 ? `(${weeklyData.length} hari terakhir)` : ""}
+                Tren Skor Kesehatan {hasData && weeklyData.length > 0 ? `${weeklyData.length} Hari Terakhirmu` : ""}
               </h3>
               {hasData && weeklyData.length > 0 ? (
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={weeklyData} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+                    <LineChart data={weeklyData} margin={{ top: 5, right: 10, left: 5, bottom: 40 }}>
+                      {" "}
+                      {/* Increased bottom margin */}
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="day"
                         angle={-45}
                         textAnchor="end"
-                        height={40}
+                        height={60} // Increased height for labels
                         interval={0}
                         tick={{ fontSize: 12 }}
-                        className="hidden sm:block"
+                        // Removed conditional hidden/block classes to ensure labels are always rendered and responsive
                       />
-                      <XAxis dataKey="day" tick={false} className="block sm:hidden" />
                       <YAxis domain={[0, 100]} />
                       <Tooltip content={<LineTooltip />} />
                       <Line
@@ -693,26 +783,27 @@ const HealthTrack = () => {
 
             {/* Daily Health Categories Chart */}
             <div className="bg-white rounded-lg p-6 mb-8 border border-gray-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">Skor Kategori Kesehatan Harian</h3>
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">Skor Kesehatan Harianmu</h3>
               {hasData && analysisData ? (
                 <div className="h-96">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dailyChartData} margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+                    <BarChart data={dailyChartData} margin={{ top: 5, right: 10, left: 5, bottom: 40 }}>
+                      {" "}
+                      {/* Increased bottom margin */}
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
                         dataKey="name"
                         angle={-45}
                         textAnchor="end"
-                        height={40}
+                        height={60} // Increased height for labels
                         interval={0}
                         tick={{ fontSize: 12 }}
-                        className="hidden sm:block"
+                        // Removed conditional hidden/block classes to ensure labels are always rendered and responsive
                         tickFormatter={(value) => {
                           const item = dailyChartData.find((d) => d.name === value)
                           return item ? item.shortName : value
                         }}
                       />
-                      <XAxis dataKey="name" tick={false} className="block sm:hidden" />
                       <YAxis domain={[0, 20]} />
                       <Tooltip content={<BarTooltip />} />
                       <Bar dataKey="score" radius={[4, 4, 0, 0]} />
@@ -850,64 +941,7 @@ const HealthTrack = () => {
                       </>
                     )
                   })()
-                : // Show empty state categories
-                  (() => {
-                    const emptyCategories = [
-                      { key: "sleep", name: "Kualitas Tidur", emoji: "😴" },
-                      { key: "exercise", name: "Aktivitas Fisik", emoji: "🏃" },
-                      { key: "hydration", name: "Hidrasi", emoji: "💧" },
-                      { key: "mental", name: "Kesehatan Mental", emoji: "😊" },
-                      { key: "diet", name: "Pola Makan", emoji: "🍔" },
-                      { key: "stress", name: "Tingkat Stress", emoji: "😰" },
-                      { key: "screenTime", name: "Screen Time", emoji: "📱" },
-                      { key: "bloodPressure", name: "Tekanan Darah", emoji: "🩺" },
-                    ]
-
-                    const firstSixEmpty = emptyCategories.slice(0, 6)
-                    const lastTwoEmpty = emptyCategories.slice(6, 8)
-
-                    return (
-                      <>
-                        {/* First 6 categories in 3 columns */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                          {firstSixEmpty.map((category) => (
-                            <div
-                              key={category.key}
-                              className="rounded-lg p-4 border-2 bg-gray-50 text-gray-500 border-gray-200"
-                            >
-                              <div className="flex items-center mb-2">
-                                <span className="text-2xl mr-2">{category.emoji}</span>
-                                <h4 className="font-semibold">{category.name}</h4>
-                              </div>
-                              <div className="text-sm">
-                                <div className="font-medium">Status: -</div>
-                                <div className="text-gray-400">Rata-rata: -</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Last 2 categories in 2 columns */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {lastTwoEmpty.map((category) => (
-                            <div
-                              key={category.key}
-                              className="rounded-lg p-4 border-2 bg-gray-50 text-gray-500 border-gray-200"
-                            >
-                              <div className="flex items-center mb-2">
-                                <span className="text-2xl mr-2">{category.emoji}</span>
-                                <h4 className="font-semibold">{category.name}</h4>
-                              </div>
-                              <div className="text-sm">
-                                <div className="font-medium">Status: -</div>
-                                <div className="text-gray-400">Rata-rata: -</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )
-                  })()}
+                : null}
             </div>
 
             {/* Recommendations */}
@@ -918,9 +952,25 @@ const HealthTrack = () => {
                   {analysisData.recommendations.map((rec, index) => (
                     <div key={index} className="bg-white rounded-lg p-4 border border-gray-200">
                       <div className="flex items-start mb-2">
-                        <span className="inline-block px-2 py-1 text-xs font-medium bg-[#ff3131] text-white rounded mr-2">
-                          {rec.priority}
-                        </span>
+                        {(() => {
+                          let priorityText = rec.priority
+                          let priorityClasses = "bg-[#ff3131] text-white" // Default for Tinggi and Kritis
+
+                          if (rec.priority === "Tinggi") {
+                            priorityText = "Penting"
+                          } else if (rec.priority.includes("Sedang")) {
+                            priorityText = "Tingkatkan"
+                            priorityClasses = "bg-yellow-50 text-yellow-600 border-yellow-200"
+                          }
+
+                          return (
+                            <span
+                              className={`inline-block px-2 py-1 text-xs font-medium rounded mr-2 ${priorityClasses}`}
+                            >
+                              {priorityText}
+                            </span>
+                          )
+                        })()}
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{rec.category}</h4>
                           <p className="text-gray-700 mt-1">{rec.message}</p>
@@ -981,7 +1031,7 @@ const HealthTrack = () => {
                   })
                   setCurrentStep(1)
                 }}
-                className="w-full sm:w-auto bg-[#ff3131] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors h-12 min-w-[200px]"
+                className="w-full sm:w-auto cursor-pointer bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white px-8 py-3 rounded-lg font-medium h-12 min-w-[200px]"
               >
                 {hasData ? "Kembali ke Beranda" : "Mulai Tracking"}
               </button>
@@ -1002,16 +1052,19 @@ const HealthTrack = () => {
           <p className="text-gray-600 mb-8">
             Jawab beberapa pertanyaan singkat untuk mendapatkan analisis kesehatan harian Anda.
           </p>
+          <p className="text-gray-600 mb-8">
+            (Jawab dengan jujur dapat meningkatkan hasil analisis kesehatan harianmu).
+          </p>
           <div className="space-y-4">
             <button
               onClick={handleStart}
-              className="w-full bg-[#ff3131] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors h-12"
+              className="w-full bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white px-8 py-3 rounded-lg font-medium h-12"
             >
               Mulai Tracking
             </button>
             <button
               onClick={() => setShowAnalysis(true)}
-              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 px-8 py-3 rounded-lg font-medium transition-colors h-12"
+              className="w-full bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white px-8 py-3 rounded-lg font-medium transition-all h-12"
             >
               Lihat Analisis
             </button>
@@ -1056,7 +1109,7 @@ const HealthTrack = () => {
             <button
               onClick={handleBack}
               disabled={isLoading}
-              className="flex items-center px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors h-12 min-w-[120px] disabled:opacity-50"
+              className="flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white border border-gray-300 rounded-lg transition-all h-12 min-w-[120px] disabled:opacity-50"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1069,7 +1122,7 @@ const HealthTrack = () => {
               <button
                 onClick={handleNext}
                 disabled={isLoading}
-                className="flex items-center px-6 py-3 bg-[#ff3131] text-white rounded-lg hover:bg-red-600 transition-colors h-12 min-w-[120px] disabled:opacity-50"
+                className="flex items-center px-6 py-3 bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white rounded-lg h-12 min-w-[120px] disabled:opacity-50"
               >
                 Next
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1080,7 +1133,7 @@ const HealthTrack = () => {
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center px-6 py-3 text-white rounded-lg transition-colors h-12 min-w-[180px] bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                className="flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white rounded-lg transition-all h-12 min-w-[180px] disabled:opacity-50"
               >
                 {isLoading ? (
                   <>

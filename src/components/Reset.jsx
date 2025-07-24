@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom"
 import Layout from "./layout/layout"
 import FormInput from "./ui/form-input"
 import SubmitButton from "./ui/submit-button"
+import { useNotification } from "../hooks/notification"
+import { Notification } from "./ui/notification"
 
 const Reset = () => {
   const navigate = useNavigate()
@@ -14,12 +16,14 @@ const Reset = () => {
   const [tempToken, setTempToken] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [error, setError] = useState("")
+  // const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  const { notificationMessage, notificationType, showNotification, clearNotification } = useNotification()
 
   const handleUsernameSubmit = async (e) => {
     e.preventDefault()
-    setError("")
+    // setError("")
     setIsLoading(true)
 
     try {
@@ -39,9 +43,11 @@ const Reset = () => {
 
       setEmail(result.data.email) // Store email from response
       setStep(2) // Move to code verification step
-      alert("Kode reset telah dikirim ke email Anda.")
+      // alert("Kode reset telah dikirim ke email Anda.")
+      showNotification("Kode reset telah dikirim ke email Anda.", "success")
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan saat mengirim kode reset.")
+      // setError(err.message || "Terjadi kesalahan saat mengirim kode reset.")
+      showNotification(err.message || "Terjadi kesalahan saat mengirim kode reset.", "error")
     } finally {
       setIsLoading(false)
     }
@@ -49,7 +55,7 @@ const Reset = () => {
 
   const handleCodeSubmit = async (e) => {
     e.preventDefault()
-    setError("")
+    // setError("")
     setIsLoading(true)
 
     try {
@@ -70,7 +76,8 @@ const Reset = () => {
       setTempToken(result.data.tempToken) // Store tempToken
       setStep(3) // Move to password update step
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan saat memverifikasi kode.")
+      // setError(err.message || "Terjadi kesalahan saat memverifikasi kode.")
+      showNotification(err.message || "Terjadi kesalahan saat memverifikasi kode.", "error")
     } finally {
       setIsLoading(false)
     }
@@ -78,15 +85,17 @@ const Reset = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault()
-    setError("")
+    // setError("")
 
     if (newPassword !== confirmPassword) {
-      setError("Kata sandi tidak cocok.")
+      // setError("Kata sandi tidak cocok.")
+      showNotification("Kata sandi tidak cocok.", "error")
       return
     }
 
     if (newPassword.length < 6) {
-      setError("Kata sandi harus minimal 6 karakter.")
+      // setError("Kata sandi harus minimal 6 karakter.")
+      showNotification("Kata sandi harus minimal 6 karakter.", "error")
       return
     }
 
@@ -107,10 +116,14 @@ const Reset = () => {
         throw new Error(result.message || "Gagal memperbarui kata sandi")
       }
 
-      alert("Kata sandi berhasil diperbarui. Silakan login.")
-      navigate("/login") // Redirect to login page
+      // alert("Kata sandi berhasil diperbarui. Silakan login.")
+      // showNotification("Kata sandi berhasil diperbarui. Silakan login.", "success") // Hapus ini
+      navigate("/login", {
+        state: { notification: { message: "Kata sandi berhasil diperbarui. Silakan login.", type: "success" } },
+      }) // Tambahkan ini
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan saat memperbarui kata sandi.")
+      // setError(err.message || "Terjadi kesalahan saat memperbarui kata sandi.")
+      showNotification(err.message || "Terjadi kesalahan saat memperbarui kata sandi.", "error")
     } finally {
       setIsLoading(false)
     }
@@ -131,15 +144,16 @@ const Reset = () => {
 
   return (
     <Layout title="Reset Kata Sandi" welcomeText={getWelcomeText()} onBack={() => navigate("/")}>
+      <Notification message={notificationMessage} type={notificationType} onClose={clearNotification} />
       <div className="space-y-3 sm:space-y-4">
-        {error && (
+        {/* {error && (
           <div
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-sm text-center font-medium"
             role="alert"
           >
             <span className="block sm:inline">{error}</span>
           </div>
-        )}
+        )} */}
 
         {step === 1 && (
           <form onSubmit={handleUsernameSubmit} noValidate className="space-y-3 sm:space-y-4">

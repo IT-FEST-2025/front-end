@@ -1,13 +1,18 @@
 import { config } from "../config"
-import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import { useForm } from "../hooks/form"
 import { validationRules } from "../utils/validasi"
 import Layout from "./layout/layout"
 import FormInput from "./ui/form-input"
 import SubmitButton from "./ui/submit-button"
+import { useNotification } from "../hooks/notification"
+import { Notification } from "./ui/notification"
 
 const Login = ({ onLoginSuccess }) => {
   const navigate = useNavigate()
+  const location = useLocation() // Inisialisasi useLocation
+  const { notificationMessage, notificationType, showNotification, clearNotification } = useNotification() // Inisialisasi useNotification
 
   const initialValues = {
     username: "",
@@ -20,6 +25,15 @@ const Login = ({ onLoginSuccess }) => {
   }
 
   const { formData, errors, isLoading, handleInputChange, handleSubmit } = useForm(initialValues, validation)
+
+  // Efek untuk menampilkan notifikasi dari state router
+  useEffect(() => {
+    if (location.state?.notification) {
+      showNotification(location.state.notification.message, location.state.notification.type)
+      // Hapus notifikasi dari state agar tidak muncul lagi saat refresh atau navigasi kembali
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, location.pathname, navigate, showNotification])
 
   const onSubmit = async (data) => {
     try {
@@ -45,7 +59,8 @@ const Login = ({ onLoginSuccess }) => {
         onLoginSuccess()
       }
     } catch (err) {
-      alert("Gagal login: " + err.message)
+      // alert("Gagal login: " + err.message) // Hapus ini
+      showNotification("Gagal login: " + err.message, "error") // Tambahkan ini
     }
   }
 
@@ -64,6 +79,8 @@ const Login = ({ onLoginSuccess }) => {
 
   return (
     <Layout title="Login" onBack={() => navigate("/")}>
+      <Notification message={notificationMessage} type={notificationType} onClose={clearNotification} />{" "}
+      {/* Tambahkan ini */}
       <form onSubmit={handleFormSubmit} className="space-y-3 sm:space-y-4" noValidate>
         <FormInput
           id="username"

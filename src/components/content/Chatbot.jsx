@@ -6,7 +6,6 @@ import ReactMarkdown from "react-markdown"
 import LoadingSpinner from "../ui/loading"
 import { getProfileImageUrl } from "../../utils/profile-images"
 
-// Define the API base URL
 const apiBaseUrl = `${config.apiChatbotService}`
 
 const apiFetch = async (method, endpoint, data = null) => {

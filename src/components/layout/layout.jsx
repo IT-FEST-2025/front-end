@@ -18,7 +18,7 @@ const Layout = ({ children, title }) => {
       <div className="flex flex-col lg:flex-row w-full h-full">
         {/* Welcome Section */}
         <section className="w-full lg:w-1/2 h-[30vh] lg:h-full p-4 sm:p-6 lg:p-12 flex flex-col justify-center items-center lg:items-start text-white relative overflow-hidden">
-          <div className="flex flex-col items-center relative z-10 cursor-pointer text-center w-full max-w-sm mx-auto lg:-translate-x-12 hover:scale-105 duration-300 transition-all">
+          <div className="flex flex-col items-center relative z-10 cursor-pointer text-center w-full max-w-sm mx-auto lg:-translate-x-12 -translate-y-5 hover:scale-105 duration-300 transition-all">
             <img src="/logo.png" alt="Logo" className="w-20 md:w-40 lg:w-70 mb-2"/>
             <p className="text-[#ff3131] text-3xl md:text-4xl lg:text-7xl font-bold sm:mb-3">Diagnify</p>
           </div>
