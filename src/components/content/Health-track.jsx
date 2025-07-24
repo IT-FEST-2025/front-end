@@ -44,7 +44,7 @@ const HealthTrack = () => {
       }
 
       // Fetch analysis data
-      const analysisResponse = await fetch(`${config.apiUserService}/tracker`, {
+      const analysisResponse = await fetch(`${config.apiUserService}tracker`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -223,10 +223,10 @@ const HealthTrack = () => {
             <div className="space-y-3">
               {[
                 { label: "0 menit", value: "0" },
-                { label: "Kurang dari 10 menit", value: "5" },
+                { label: "<10 menit", value: "5" },
                 { label: "10-30 menit", value: "20" },
                 { label: "30-60 menit", value: "45" },
-                { label: "Lebih dari 60 menit", value: "75" },
+                { label: ">60 menit", value: "75" },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -340,7 +340,7 @@ const HealthTrack = () => {
               <p className="text-gray-600">Berapa kali kamu makan makanan olahan atau junk food hari ini?</p>
             </div>
             <div className="space-y-3">
-              {["0", "1", "2", "3", "4", "5+"].map((option, index) => (
+              {["0", "1", "2", "3", "4", "≥5"].map((option, index) => (
                 <button
                   key={option}
                   onClick={() => handleInputChange("junk_food_count", index.toString())}
@@ -382,8 +382,8 @@ const HealthTrack = () => {
                 ))}
               </div>
               <div className="flex justify-between text-sm text-gray-500">
-                <span>Sangat Buruk</span>
-                <span>Sangat Baik</span>
+                <span>Sangat Buruk (1)</span>
+                <span>Sangat Baik (5)</span>
               </div>
             </div>
           </div>
@@ -414,8 +414,8 @@ const HealthTrack = () => {
                 ))}
               </div>
               <div className="flex justify-between text-sm text-gray-500">
-                <span>Tidak Stres</span>
-                <span>Sangat Stres</span>
+                <span>Tidak Stres (1)</span>
+                <span>Sangat Stres (5)</span>
               </div>
             </div>
           </div>

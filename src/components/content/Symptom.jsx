@@ -332,16 +332,17 @@ const Symptom = () => {
                       {/* Disease Header */}
                       <div className="mb-4 pb-4 border-b border-gray-100">
                         <div className="flex items-center mb-3">
-                          <div className="bg-[#ff3131] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm mr-3">
+                          <div className="bg-[#ff3131] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm mr-3 flex-shrink-0">
                             {index + 1}
                           </div>
-                          <h5 className="text-xl font-bold text-gray-800">
+                          <h5 className="text-xl font-bold text-gray-800 min-w-0 flex-grow">
                             {item.disease.charAt(0).toUpperCase() + item.disease.slice(1)}
                           </h5>
                         </div>
                         <div className="ml-11">
                           <div className="inline-flex items-center bg-[#ff3131] text-white px-4 py-2 rounded-full text-sm font-semibold">
-                            Probabilitas: {prediction?.predicted_diseases?.[index]?.probability ?? "N/A"}
+                            Probabilitas:{" "}
+                            {((prediction?.predicted_diseases?.[index]?.probability ?? 0) * 100).toFixed(1) + "%"}
                           </div>
                         </div>
                       </div>
