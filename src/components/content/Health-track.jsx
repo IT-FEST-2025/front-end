@@ -44,7 +44,7 @@ const HealthTrack = () => {
       }
 
       // Fetch analysis data
-      const analysisResponse = await fetch(`${config.apiUserService}tracker`, {
+      const analysisResponse = await fetch(`${config.apiUserService}/tracker`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
