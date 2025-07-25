@@ -1,4 +1,4 @@
-// import { config } from "../../config"
+import { config } from "../../config"
 import { useState, useEffect } from "react"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts"
 
@@ -44,7 +44,7 @@ const HealthTrack = () => {
       }
 
       // Fetch analysis data
-      const analysisResponse = await fetch("https://api.ayuwoki.my.id/users/tracker", {
+      const analysisResponse = await fetch(`${config.apiUserService}/tracker`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -161,7 +161,7 @@ const HealthTrack = () => {
         blood_pressure: Number(formData.blood_pressure) || 120,
       }
 
-      const response = await fetch("https://api.ayuwoki.my.id/users/tracker", {
+      const response = await fetch(`${config.apiUserService}/tracker`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1051,6 +1051,7 @@ const HealthTrack = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Health Tracker</h1>
           <p className="text-gray-600 mb-8">
             Jawab beberapa pertanyaan singkat untuk mendapatkan analisis kesehatan harian Anda.
+            Anda hanya dapat mengisi fitur ini sehari sekali.
           </p>
           <p className="text-gray-600 mb-8">
             (Jawab dengan jujur dapat meningkatkan hasil analisis kesehatan harianmu).
