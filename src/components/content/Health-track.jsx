@@ -1,4 +1,4 @@
-import { config } from "../../config"
+// import { config } from "../../config"
 import { useState, useEffect } from "react"
 import { Line, LineChart, Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts"
 
@@ -44,7 +44,7 @@ const HealthTrack = () => {
       }
 
       // Fetch analysis data
-      const analysisResponse = await fetch(`${config.apiUserService}/tracker`, {
+      const analysisResponse = await fetch("https://api.ayuwoki.my.id/users/tracker", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -161,7 +161,7 @@ const HealthTrack = () => {
         blood_pressure: Number(formData.blood_pressure) || 120,
       }
 
-      const response = await fetch(`${config.apiUserService}/tracker`, {
+      const response = await fetch("https://api.ayuwoki.my.id/users/tracker", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -182,7 +182,7 @@ const HealthTrack = () => {
             'new row for relation "health_records" violates check constraint "health_records_blood_pressure_check"',
           )
         ) {
-          throw new Error("Anda sudah mengisi Health Track hari ini. Silakan coba lagi besok.")
+          throw new Error("Nilai tekanan darah tidak valid. Silakan masukkan nilai yang valid.")
         } else if (
           errorData.message &&
           (errorData.message.includes("duplicate") || errorData.message.includes("sudah ada"))
