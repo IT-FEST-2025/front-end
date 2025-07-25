@@ -215,7 +215,7 @@ const HealthTrack = () => {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">🏃</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Aktivitas Fisik</h2>
               <p className="text-gray-600">Berapa menit kamu berolahraga atau bergerak aktif hari ini?</p>
@@ -231,10 +231,10 @@ const HealthTrack = () => {
                 <button
                   key={option.value}
                   onClick={() => handleInputChange("exercise_minutes", option.value)}
-                  className={`w-full p-4 text-left rounded-lg border-2 transition-all h-14 flex items-center ${
+                  className={`cursor-pointer w-full p-4 text-left rounded-lg border-2 transition-all h-14 flex items-center ${
                     formData.exercise_minutes === option.value
                       ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-gray-200 hover:border-[#ff3131]"
                   }`}
                 >
                   {option.label}
@@ -246,7 +246,7 @@ const HealthTrack = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">🏃</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Jenis Olahraga</h2>
               <p className="text-gray-600">Jenis olahraga hari ini?</p>
@@ -263,10 +263,10 @@ const HealthTrack = () => {
                 <button
                   key={option.value}
                   onClick={() => handleInputChange("exercise_type", option.value)}
-                  className={`p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
+                  className={`cursor-pointer p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
                     formData.exercise_type === option.value
                       ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-gray-200 hover:border-[#ff3131]"
                   }`}
                 >
                   {option.label}
@@ -276,10 +276,10 @@ const HealthTrack = () => {
             <div className="w-full">
               <button
                 onClick={() => handleInputChange("exercise_type", "lainnya")}
-                className={`w-full p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
+                className={`cursor-pointer w-full p-4 text-center rounded-lg border-2 transition-all h-14 flex items-center justify-center ${
                   formData.exercise_type === "lainnya"
                     ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-gray-200 hover:border-[#ff3131]"
                 }`}
               >
                 Lainnya
@@ -290,7 +290,7 @@ const HealthTrack = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">😴</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tidur</h2>
               <p className="text-gray-600">Berapa jam kamu tidur semalam?</p>
@@ -301,12 +301,12 @@ const HealthTrack = () => {
                 value={formData.sleep_hours}
                 onChange={(e) => handleInputChange("sleep_hours", e.target.value)}
                 placeholder="Masukkan jumlah jam"
-                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none h-16"
+                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none duration-200 transition-colors h-16"
                 min="0"
                 max="24"
                 step="0.5"
               />
-              <p className="text-center text-gray-500 mt-2">jam</p>
+              <p className="cursor-default text-center text-gray-500 mt-2">jam</p>
             </div>
           </div>
         )
@@ -334,7 +334,7 @@ const HealthTrack = () => {
       case 5:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">🍔</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Pola Makan</h2>
               <p className="text-gray-600">Berapa kali kamu makan makanan olahan atau junk food hari ini?</p>
@@ -344,10 +344,10 @@ const HealthTrack = () => {
                 <button
                   key={option}
                   onClick={() => handleInputChange("junk_food_count", index.toString())}
-                  className={`w-full p-4 text-left rounded-lg border-2 transition-all h-14 flex items-center ${
+                  className={`cursor-pointer w-full p-4 text-left rounded-lg border-2 transition-all h-14 flex items-center ${
                     formData.junk_food_count === index.toString()
                       ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-gray-200 hover:border-[#ff3131]"
                   }`}
                 >
                   {option} kali
@@ -359,29 +359,29 @@ const HealthTrack = () => {
       case 6:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">😊</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Mood Keseluruhan</h2>
               <p className="text-gray-600">Bagaimana mood kamu secara keseluruhan hari ini?</p>
             </div>
             <div className="space-y-4">
-              <div className="text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
+              <div className="cursor-default text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
               <div className="flex flex-wrap justify-center gap-2 sm:justify-between items-center">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
                     key={rating}
                     onClick={() => handleInputChange("overall_mood", rating.toString())}
-                    className={`w-16 h-16 rounded-full border-2 text-xl font-bold transition-all ${
+                    className={`cursor-pointer w-16 h-16 rounded-full border-2 text-xl font-bold transition-all ${
                       formData.overall_mood === rating.toString()
                         ? "border-[#ff3131] bg-red-50 text-[#ff3131]"
-                        : "border-gray-200 hover:border-gray-300"
+                        : "border-gray-200 hover:border-[#ff3131]"
                     }`}
                   >
                     {rating}
                   </button>
                 ))}
               </div>
-              <div className="flex justify-between text-sm text-gray-500">
+              <div className="cursor-default flex justify-between text-sm text-gray-500">
                 <span>Sangat Buruk (1)</span>
                 <span>Sangat Baik (5)</span>
               </div>
@@ -391,13 +391,13 @@ const HealthTrack = () => {
       case 7:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">😰</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tingkat Stress</h2>
               <p className="text-gray-600">Seberapa stres kamu hari ini?</p>
             </div>
             <div className="space-y-4">
-              <div className="text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
+              <div className="cursor-default text-center text-sm text-gray-500 mb-4">Skala 1-5</div>
               <div className="flex flex-wrap justify-center gap-2 sm:justify-between items-center">
                 {[1, 2, 3, 4, 5].map((rating) => (
                   <button
@@ -413,7 +413,7 @@ const HealthTrack = () => {
                   </button>
                 ))}
               </div>
-              <div className="flex justify-between text-sm text-gray-500">
+              <div className="cursor-default flex justify-between text-sm text-gray-500">
                 <span>Tidak Stres (1)</span>
                 <span>Sangat Stres (5)</span>
               </div>
@@ -423,7 +423,7 @@ const HealthTrack = () => {
       case 8:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">📱</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Screen Time</h2>
               <p className="text-gray-600">Berapa jam screen time kamu hari ini?</p>
@@ -434,18 +434,18 @@ const HealthTrack = () => {
                 value={formData.screen_time_hours}
                 onChange={(e) => handleInputChange("screen_time_hours", e.target.value)}
                 placeholder="Masukkan jumlah jam"
-                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none h-16"
+                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none duration-200 transition-colors h-16"
                 min="0"
                 step="0.5"
               />
-              <p className="text-center text-gray-500 mt-2">jam</p>
+              <p className="cursor-default text-center text-gray-500 mt-2">jam</p>
             </div>
           </div>
         )
       case 9:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
+            <div className="cursor-default text-center mb-8">
               <div className="text-4xl mb-4">🩺</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Tekanan Darah</h2>
               <p className="text-gray-600">Masukkan tekanan darah sistolik Anda (misal: 120)</p>
@@ -457,10 +457,10 @@ const HealthTrack = () => {
                 value={formData.blood_pressure}
                 onChange={(e) => handleInputChange("blood_pressure", e.target.value)}
                 placeholder="Masukkan tekanan darah"
-                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none h-16"
+                className="w-full p-4 text-center text-2xl border-2 border-gray-200 rounded-lg focus:border-[#ff3131] focus:outline-none duration-200 transition-colors h-16"
                 min="0"
               />
-              <p className="text-center text-gray-500 mt-2">mmHg</p>
+              <p className="cursor-default text-center text-gray-500 mt-2">mmHg</p>
             </div>
           </div>
         )
@@ -1046,7 +1046,7 @@ const HealthTrack = () => {
   if (!isStarted && !showAnalysis) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md w-full">
+        <div className="cursor-default text-center max-w-md w-full">
           <div className="text-6xl mb-4">🩺</div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Health Tracker</h1>
           <p className="text-gray-600 mb-8">
@@ -1058,13 +1058,13 @@ const HealthTrack = () => {
           <div className="space-y-4">
             <button
               onClick={handleStart}
-              className="w-full bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white px-8 py-3 rounded-lg font-medium h-12"
+              className="cursor-pointer w-full bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white px-8 py-3 rounded-lg font-medium h-12"
             >
               Mulai Tracking
             </button>
             <button
               onClick={() => setShowAnalysis(true)}
-              className="w-full bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white px-8 py-3 rounded-lg font-medium transition-all h-12"
+              className="cursor-pointer w-full bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white px-8 py-3 rounded-lg font-medium transition-all h-12"
             >
               Lihat Analisis
             </button>
@@ -1079,8 +1079,8 @@ const HealthTrack = () => {
     <div className="min-h-screen bg-gray-50 pt-20 pb-8 px-4">
       <div className="w-[90%] max-w-7xl mx-auto">
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">Progress</span>
+          <div className="cursor-default flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-700">Progres</span>
             <span className="text-sm font-medium text-gray-700">
               {currentStep}/{totalSteps}
             </span>
@@ -1109,7 +1109,7 @@ const HealthTrack = () => {
             <button
               onClick={handleBack}
               disabled={isLoading}
-              className="flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white border border-gray-300 rounded-lg transition-all h-12 min-w-[120px] disabled:opacity-50"
+              className="cursor-pointer flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white border border-gray-300 rounded-lg transition-all h-12 min-w-[120px] disabled:opacity-50"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1122,7 +1122,7 @@ const HealthTrack = () => {
               <button
                 onClick={handleNext}
                 disabled={isLoading}
-                className="flex items-center px-6 py-3 bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white rounded-lg h-12 min-w-[120px] disabled:opacity-50"
+                className="cursor-pointer flex items-center px-6 py-3 bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white rounded-lg h-12 min-w-[120px] disabled:opacity-50"
               >
                 Next
                 <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1133,7 +1133,7 @@ const HealthTrack = () => {
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white rounded-lg transition-all h-12 min-w-[180px] disabled:opacity-50"
+                className="cursor-pointer flex items-center px-6 py-3 bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white rounded-lg transition-all h-12 min-w-[180px] disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
