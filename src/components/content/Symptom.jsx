@@ -134,7 +134,7 @@ const Symptom = () => {
     <div className="min-h-screen bg-gray-50 pt-20 lg:pt-25 pb-8 px-4">
       <div className="w-full max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 cursor-default">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Cek Prediksi Penyakit</h1>
           <p className="text-gray-600">Masukkan gejala yang Anda rasakan untuk mendapatkan prediksi penyakit</p>
         </div>
@@ -181,10 +181,10 @@ const Symptom = () => {
                       <button
                         key={idx}
                         onClick={() => toggleSymptom(symptomObj)}
-                        className={`p-3 text-left rounded-lg border-2 transition-all duration-200 ${
+                        className={`cursor-pointer p-3 text-left rounded-lg border-2 transition-all duration-200 ${
                           isSelected
                             ? "border-[#ff3131] bg-red-50 text-[#ff3131] shadow-md"
-                            : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+                            : "border-gray-200 bg-white hover:border-[#ff3131] hover:shadow-sm"
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -200,7 +200,7 @@ const Symptom = () => {
 
             {/* No symptoms found */}
             {query && !searchLoading && symptoms.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="cursor-default text-center py-8 text-gray-500">
                 <div className="text-4xl mb-2">🔍</div>
                 <p className="font-medium">Gejala tidak ditemukan</p>
                 <p className="text-sm">Coba kata kunci yang berbeda</p>
@@ -212,19 +212,19 @@ const Symptom = () => {
         {/* Selected Symptoms */}
         {selectedSymptomsDisplay.length > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 cursor-default">
               Gejala Terpilih ({selectedSymptomsDisplay.length})
             </h3>
             <div className="flex flex-wrap gap-2 mb-4">
               {selectedSymptomsDisplay.map((symptomDisplay, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#ff3131] text-white"
+                  className="cursor-pointer inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white"
                 >
                   {symptomDisplay}
                   <button
                     onClick={() => removeSingleSymptom(symptomDisplay)}
-                    className="ml-2 hover:bg-red-600 rounded-full p-1 transition-colors"
+                    className="cursor-pointer ml-2 hover:bg-red-600 rounded-full p-1 transition-colors"
                   >
                     ×
                   </button>
@@ -236,7 +236,7 @@ const Symptom = () => {
               <button
                 onClick={handleCheck}
                 disabled={selectedSymptoms.length === 0 || loading}
-                className="flex-1 sm:flex-none bg-[#ff3131] hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-12 min-w-[200px]"
+                className="cursor-pointer flex-1 sm:flex-none bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all text-white px-8 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed h-12 min-w-[200px]"
               >
                 {loading ? (
                   <div className="flex items-center justify-center">
@@ -251,7 +251,7 @@ const Symptom = () => {
               <button
                 onClick={handleReset}
                 disabled={loading}
-                className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 h-12"
+                className="cursor-pointer flex-1 sm:flex-none bg-green-600 hover:scale-105 duration-300 hover:shadow-[0_0_40px_#008000] text-white px-6 py-3 rounded-lg font-medium transition-all disabled:opacity-50 h-12"
               >
                 Reset
               </button>
@@ -261,7 +261,7 @@ const Symptom = () => {
 
         {/* Prediction Results */}
         {prediction && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 cursor-default">
             <div className="text-center mb-6">
               <div className="text-4xl mb-2">📋</div>
               <h2 className="text-2xl font-bold text-gray-900">Hasil Prediksi</h2>
@@ -413,7 +413,7 @@ const Symptom = () => {
 
         {/* Empty State */}
         {!query && selectedSymptomsDisplay.length === 0 && !prediction && (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="cursor-default bg-white rounded-xl shadow-lg p-8 text-center">
             <div className="text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Mulai Pencarian</h3>
             <p className="text-gray-600 mb-6">
