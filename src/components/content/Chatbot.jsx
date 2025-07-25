@@ -686,7 +686,7 @@ const Chatbot = ({ user }) => {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="cursor-pointer flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+                className="cursor-pointer flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:scale-105 duration-300 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
               >
                 {isLoading ? (
                   <LoadingSpinner size="sm" />
