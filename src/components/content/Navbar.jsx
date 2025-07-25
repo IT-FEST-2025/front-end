@@ -231,7 +231,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
             <div className="hidden md:flex items-center space-x-8">
               <button
                 onClick={(e) => handleNavClick("home", e)}
-                className={`font-medium transition-all duration-300 pb-1 relative group ${
+                className={`cursor-pointer font-medium transition-all duration-300 pb-1 relative group ${
                   currentPage === "home" ? "font-bold" : ""
                 } ${shouldUseRedBackground ? "text-white" : "text-[#ff3131]"}`}
               >
@@ -252,7 +252,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
 
               <button
                 onClick={(e) => handleNavClick("symptom", e)}
-                className={`font-medium transition-all duration-300 pb-1 relative group ${
+                className={`cursor-pointer font-medium transition-all duration-300 pb-1 relative group ${
                   currentPage === "symptom" ? "font-bold" : ""
                 } ${shouldUseRedBackground ? "text-white" : "text-[#ff3131]"}`}
               >
@@ -277,7 +277,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
 
               <button
                 onClick={(e) => handleNavClick("chatbot", e)}
-                className={`font-medium transition-all duration-300 pb-1 relative group ${
+                className={`cursor-pointer font-medium transition-all duration-300 pb-1 relative group ${
                   currentPage === "chatbot" ? "font-bold" : ""
                 } ${shouldUseRedBackground ? "text-white" : "text-[#ff3131]"}`}
               >
@@ -302,7 +302,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
 
               <button
                 onClick={(e) => handleNavClick("health-tracker", e)}
-                className={`font-medium transition-all duration-300 pb-1 relative group ${
+                className={`cursor-pointer font-medium transition-all duration-300 pb-1 relative group ${
                   currentPage === "health-tracker" ? "font-bold" : ""
                 } ${shouldUseRedBackground ? "text-white" : "text-[#ff3131]"}`}
               >
@@ -385,7 +385,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
                     <div className="py-1">
                       <button
                         onClick={handleEditProfile}
-                        className={`flex items-center w-full px-4 py-2 text-sm transition-all duration-200 group border-l-4 ${
+                        className={`cursor-pointer flex items-center w-full px-4 py-2 text-sm transition-all duration-200 group border-l-4 ${
                           currentPage === "profile"
                             ? "font-bold text-[#ff3131] border-[#ff3131] bg-red-50"
                             : "text-gray-700 border-transparent hover:bg-red-50 hover:border-[#ff3131] hover:text-[#ff3131]"
@@ -411,7 +411,7 @@ const Navbar = ({ user, onNavigate, onLogout }) => {
 
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 group border-l-4 border-transparent hover:border-red-500"
+                        className="cursor-pointer flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-all duration-200 group border-l-4 border-transparent hover:border-red-500"
                       >
                         <svg
                           className="w-4 h-4 mr-3 transition-transform duration-200 group-hover:scale-110"
