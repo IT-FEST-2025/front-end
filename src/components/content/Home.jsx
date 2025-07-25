@@ -108,8 +108,8 @@ const Home = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">AI Symptom Checker</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Advanced AI technology analyzes your symptoms and provides preliminary health assessments with high
-                    accuracy and reliability.
+                    Teknologi kecerdasan buatan untuk menganalisis gejala Anda dan memberikan beberapa prediksi penyakit beserta masing-masing
+                    probabilitasnya.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -120,7 +120,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Instant symptom analysis
+                      Analisis gejala secara instan.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -130,7 +130,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      95% accuracy rate
+                      60.000 dataset penyakit.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -140,7 +140,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Personalized recommendations
+                      Rekomendasi pengobatan.
                     </li>
                   </ul>
                 </div>
@@ -161,8 +161,7 @@ const Home = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Chatbot Konsultasi</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Interactive AI chatbot provides 24/7 health consultation, answers medical questions, and guides you
-                    through health concerns.
+                    Chatbot AI interaktif yang menyediakan konsultasi kesehatan 24/7, menjawab pertanyaan medis, dan membimbing Anda dalam mengatasi masalah kesehatan.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -173,7 +172,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      24/7 availability
+                      Tersedia selama 24/7.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -183,7 +182,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Multilingual support
+                      Mendukung bahasa istilah medis.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -193,7 +192,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Expert-backed responses
+                      Tidak memiliki batasan konsultasi.
                     </li>
                   </ul>
                 </div>
@@ -214,8 +213,8 @@ const Home = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Health Tracker</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Comprehensive health monitoring system tracks vital signs, symptoms, medications, and provides
-                    detailed health analytics.
+                    Memantau kebiasaan hidup sehari-hari, seperti pola tidur, konsumsi air, makanan cepat saji, serta waktu layar. Sistem
+                    akan memberikan saran personal yang membantu pengguna memperbaiki gaya hidupnya secara berkelanjutan.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -226,7 +225,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Vital signs monitoring
+                      Memantau pola hidup harian.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -236,7 +235,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Progress analytics
+                      Analisis berprogress.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -246,7 +245,7 @@ const Home = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Medication reminders
+                      Rekomendasi personal.
                     </li>
                   </ul>
                 </div>
