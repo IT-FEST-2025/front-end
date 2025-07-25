@@ -1,9 +1,8 @@
 import { config } from "../../config"
 import { useState, useRef, useEffect } from "react"
-import { getProfileImageUrl } from "../../utils/profile-images" // Pastikan path ini benar
+import { getProfileImageUrl } from "../../utils/profile-images"
 
 const Profile = ({ user = {}, onUserUpdate }) => {
-  // Tambahkan onUserUpdate prop
   // State untuk form data, inisialisasi dari prop user
   const [formData, setFormData] = useState({
     username: user?.username || "",
@@ -13,8 +12,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     age: user?.age || "",
     height: user?.height || "",
     weight: user?.weight || "",
-    medicalHistory: user?.chronicDiseases ? user.chronicDiseases.join(", ") : "", // Gunakan chronicDiseases
-    isActiveSmoker: user?.smokingStatus === "aktif" ? "Ya" : "Tidak", // Gunakan smokingStatus
+    medicalHistory: user?.chronicDiseases ? user.chronicDiseases.join(", ") : "",
+    isActiveSmoker: user?.smokingStatus === "aktif" ? "Ya" : "Tidak",
   })
 
   // State untuk URL gambar profil yang ditampilkan, inisialisasi dari prop user
@@ -62,6 +61,21 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     })
     setProfileImage(user?.profilePicture ? getProfileImageUrl(user.profilePicture) : null)
   }, [user]) // Bergantung pada prop user
+
+  // Prevent body scroll when cropping modal is open
+  useEffect(() => {
+    if (showImageCropper) {
+      // Prevent body scroll
+      document.body.style.overflow = "hidden"
+      document.body.style.touchAction = "none"
+
+      return () => {
+        // Restore body scroll
+        document.body.style.overflow = "unset"
+        document.body.style.touchAction = "auto"
+      }
+    }
+  }, [showImageCropper])
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -200,6 +214,153 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     }
   }
 
+  // Handle mouse up
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    setIsResizing(false)
+  }
+
+  // Handle touch start
+  const handleTouchStart = (e) => {
+    if (!imageLoaded) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const touch = e.touches[0]
+    const rect = imageRef.current.getBoundingClientRect()
+    const x = touch.clientX - rect.left
+    const y = touch.clientY - rect.top
+
+    // Check if touch is on resize handle
+    if (isOnResizeHandle(x, y)) {
+      setIsResizing(true)
+      const centerX = cropData.x + cropData.size / 2
+      const centerY = cropData.y + cropData.size / 2
+      const initialDistance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2))
+
+      setResizeStart({
+        x: centerX,
+        y: centerY,
+        initialSize: cropData.size,
+        initialDistance: initialDistance,
+      })
+    } else if (
+      x >= cropData.x &&
+      x <= cropData.x + cropData.size &&
+      y >= cropData.y &&
+      y <= cropData.y + cropData.size
+    ) {
+      setIsDragging(true)
+      setDragStart({
+        x: x - cropData.x,
+        y: y - cropData.y,
+      })
+    }
+  }
+
+  // Handle touch move
+  const handleTouchMove = (e) => {
+    if (!imageLoaded || (!isDragging && !isResizing)) return
+
+    e.preventDefault()
+    e.stopPropagation()
+
+    const touch = e.touches[0]
+    const rect = imageRef.current.getBoundingClientRect()
+    const x = touch.clientX - rect.left
+    const y = touch.clientY - rect.top
+
+    if (isResizing) {
+      const currentDistance = Math.sqrt(Math.pow(x - resizeStart.x, 2) + Math.pow(y - resizeStart.y, 2))
+      const ratio = currentDistance / resizeStart.initialDistance
+      let newSize = Math.round(resizeStart.initialSize * ratio)
+
+      // Constrain size based on display dimensions
+      const minSize = 50
+      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.9
+      newSize = Math.max(minSize, Math.min(newSize, maxSize))
+
+      // Calculate new position to keep center
+      const newX = Math.max(0, Math.min(resizeStart.x - newSize / 2, imageDisplaySize.width - newSize))
+      const newY = Math.max(0, Math.min(resizeStart.y - newSize / 2, imageDisplaySize.height - newSize))
+
+      setCropData({
+        x: newX,
+        y: newY,
+        size: newSize,
+      })
+    } else if (isDragging) {
+      const newX = Math.max(0, Math.min(x - dragStart.x, imageDisplaySize.width - cropData.size))
+      const newY = Math.max(0, Math.min(y - dragStart.y, imageDisplaySize.height - cropData.size))
+
+      setCropData((prev) => ({
+        ...prev,
+        x: newX,
+        y: newY,
+      }))
+    }
+  }
+
+  // Handle touch end
+  const handleTouchEnd = (e) => {
+    e.preventDefault()
+    setIsDragging(false)
+    setIsResizing(false)
+  }
+
+  // Check if click is on resize handle
+  const isOnResizeHandle = (x, y) => {
+    const handleSize = 15 // Increased for better touch interaction
+    const cropRight = cropData.x + cropData.size
+    const cropBottom = cropData.y + cropData.size
+
+    // Check corners
+    const corners = [
+      { x: cropData.x, y: cropData.y }, // top-left
+      { x: cropRight, y: cropData.y }, // top-right
+      { x: cropData.x, y: cropBottom }, // bottom-left
+      { x: cropRight, y: cropBottom }, // bottom-right
+    ]
+
+    for (const corner of corners) {
+      if (
+        x >= corner.x - handleSize &&
+        x <= corner.x + handleSize &&
+        y >= corner.y - handleSize &&
+        y <= corner.y + handleSize
+      ) {
+        return true
+      }
+    }
+
+    return false
+  }
+
+  // Get cursor style based on mouse position
+  const getCursorStyle = (e) => {
+    if (!imageLoaded) return "default"
+
+    const rect = imageRef.current?.getBoundingClientRect()
+    if (!rect) return "default"
+
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+
+    if (isOnResizeHandle(x, y)) {
+      return "nw-resize"
+    } else if (
+      x >= cropData.x &&
+      x <= cropData.x + cropData.size &&
+      y >= cropData.y &&
+      y <= cropData.y + cropData.size
+    ) {
+      return isDragging ? "grabbing" : "grab"
+    }
+
+    return "default"
+  }
+
   // Update handleCropImage function to work with zoom
   const handleCropImage = () => {
     const canvas = canvasRef.current
@@ -325,64 +486,6 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       setIsLoading(false)
       setTimeout(() => setShowSuccessPopup(false), 1500)
     }
-  }
-
-  // Check if click is on resize handle
-  const isOnResizeHandle = (x, y) => {
-    const handleSize = 10
-    const cropRight = cropData.x + cropData.size
-    const cropBottom = cropData.y + cropData.size
-
-    // Check corners
-    const corners = [
-      { x: cropData.x, y: cropData.y }, // top-left
-      { x: cropRight, y: cropData.y }, // top-right
-      { x: cropData.x, y: cropBottom }, // bottom-left
-      { x: cropRight, y: cropBottom }, // bottom-right
-    ]
-
-    for (const corner of corners) {
-      if (
-        x >= corner.x - handleSize &&
-        x <= corner.x + handleSize &&
-        y >= corner.y - handleSize &&
-        y <= corner.y + handleSize
-      ) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  // Handle mouse up
-  const handleMouseUp = () => {
-    setIsDragging(false)
-    setIsResizing(false)
-  }
-
-  // Get cursor style based on mouse position
-  const getCursorStyle = (e) => {
-    if (!imageLoaded) return "default"
-
-    const rect = imageRef.current?.getBoundingClientRect()
-    if (!rect) return "default"
-
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-
-    if (isOnResizeHandle(x, y)) {
-      return "nw-resize"
-    } else if (
-      x >= cropData.x &&
-      x <= cropData.x + cropData.size &&
-      y >= cropData.y &&
-      y <= cropData.y + cropData.size
-    ) {
-      return isDragging ? "grabbing" : "grab"
-    }
-
-    return "default"
   }
 
   // Handle form submission
@@ -516,10 +619,15 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       {/* Image Cropper Modal */}
       {showImageCropper && tempImage && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-hidden"
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            touchAction: "none", // Prevent touch scrolling
+          }}
+          onTouchMove={(e) => e.preventDefault()} // Prevent scroll on touch
+          onWheel={(e) => e.preventDefault()} // Prevent scroll on wheel
         >
-          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-full overflow-auto">
+          <div className="bg-white rounded-lg p-4 sm:p-6 max-w-3xl w-full max-h-full overflow-hidden">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Sesuaikan Foto Profil</h3>
               <button
@@ -540,13 +648,15 @@ const Profile = ({ user = {}, onUserUpdate }) => {
               {/* Image with crop overlay */}
               <div className="flex justify-center">
                 <div
-                  className="relative inline-block select-none"
+                  className="relative inline-block select-none touch-none"
                   onMouseMove={(e) => {
                     handleMouseMove(e)
                     e.currentTarget.style.cursor = getCursorStyle(e)
                   }}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                   style={{ cursor: "default" }}
                 >
                   <img
@@ -557,12 +667,13 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     style={{
                       width: imageDisplaySize.width,
                       height: imageDisplaySize.height,
-                      maxWidth: "none",
-                      maxHeight: "500px",
+                      maxWidth: "100%",
+                      maxHeight: "400px",
                       objectFit: "contain",
                     }}
                     onLoad={handleImageLoad}
                     onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
                     draggable={false}
                   />
                   {/* Crop overlay */}
@@ -578,10 +689,10 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                       }}
                     >
                       {/* Resize handles */}
-                      <div className="absolute -top-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-nw-resize"></div>
-                      <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-ne-resize"></div>
-                      <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-sw-resize"></div>
-                      <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-red-500 pointer-events-auto cursor-se-resize"></div>
+                      <div className="absolute -top-3 -left-3 w-6 h-6 bg-red-500 pointer-events-auto cursor-nw-resize rounded-full border-2 border-white shadow-lg"></div>
+                      <div className="absolute -top-3 -right-3 w-6 h-6 bg-red-500 pointer-events-auto cursor-ne-resize rounded-full border-2 border-white shadow-lg"></div>
+                      <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-red-500 pointer-events-auto cursor-sw-resize rounded-full border-2 border-white shadow-lg"></div>
+                      <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-red-500 pointer-events-auto cursor-se-resize rounded-full border-2 border-white shadow-lg"></div>
                     </div>
                   )}
                 </div>
