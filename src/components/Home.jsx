@@ -113,7 +113,7 @@ const Home = ({ onNavigateToRegister }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
               {/* AI Symptom Checker */}
               <Animated delay={100} animation="translate-y-12 opacity-0 scale-95">
-                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
+                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2 h-full">
                   <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -126,8 +126,8 @@ const Home = ({ onNavigateToRegister }) => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">AI Symptom Checker</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Advanced AI technology analyzes your symptoms and provides preliminary health assessments with high
-                    accuracy and reliability.
+                    Teknologi kecerdasan buatan untuk menganalisis gejala Anda dan memberikan beberapa prediksi penyakit beserta masing-masing
+                    probabilitasnya.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -138,7 +138,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Instant symptom analysis
+                      Analisis gejala secara instan.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -148,7 +148,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      95% accuracy rate
+                      60.000 dataset penyakit.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -158,7 +158,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Personalized recommendations
+                      Rekomendasi pengobatan.
                     </li>
                   </ul>
                 </div>
@@ -166,7 +166,7 @@ const Home = ({ onNavigateToRegister }) => {
 
               {/* Chatbot Konsultasi */}
               <Animated delay={200} animation="translate-y-12 opacity-0 scale-95">
-                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2">
+                <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-[0_0_40px_#b81414] hover:scale-102 transition-all duration-300 hover:-translate-y-2 h-full">
                   <div className="w-16 h-16 bg-[#ff3131] shadow-[0_0_40px_#ff3131] rounded-full flex items-center justify-center mx-auto mb-6">
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -179,8 +179,7 @@ const Home = ({ onNavigateToRegister }) => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Chatbot Konsultasi</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Interactive AI chatbot provides 24/7 health consultation, answers medical questions, and guides you
-                    through health concerns.
+                    Chatbot AI interaktif yang menyediakan konsultasi kesehatan 24/7, menjawab pertanyaan medis, dan membimbing Anda dalam mengatasi masalah kesehatan.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -191,7 +190,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      24/7 availability
+                      Tersedia selama 24/7.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -201,7 +200,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Multilingual support
+                      Mendukung bahasa istilah medis.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -211,7 +210,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Expert-backed responses
+                      Tidak memiliki batasan konsultasi.
                     </li>
                   </ul>
                 </div>
@@ -232,8 +231,8 @@ const Home = ({ onNavigateToRegister }) => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Health Tracker</h3>
                   <p className="text-gray-600 text-center mb-6">
-                    Comprehensive health monitoring system tracks vital signs, symptoms, medications, and provides
-                    detailed health analytics.
+                    Memantau kebiasaan hidup sehari-hari, seperti pola tidur, konsumsi air, makanan cepat saji, serta waktu layar. Sistem
+                    akan memberikan saran personal yang membantu pengguna memperbaiki gaya hidupnya secara berkelanjutan.
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center">
@@ -244,7 +243,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Vital signs monitoring
+                      Memantau pola hidup harian.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -254,7 +253,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Progress analytics
+                      Analisis berprogress.
                     </li>
                     <li className="flex items-center">
                       <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -264,7 +263,7 @@ const Home = ({ onNavigateToRegister }) => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      Medication reminders
+                      Rekomendasi personal.
                     </li>
                   </ul>
                 </div>
