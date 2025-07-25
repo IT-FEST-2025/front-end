@@ -441,14 +441,14 @@ const Chatbot = ({ user }) => {
                         />
                       </svg>
                     </div>
-                    <div>
+                    <div className="cursor-default">
                       <h1 className="text-xl font-semibold text-[#ff3131]">Diagnify AI</h1>
                       <p className="text-base text-gray-500">Asisten Kesehatan</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -457,7 +457,7 @@ const Chatbot = ({ user }) => {
                 </div>
                 <button
                   onClick={createNewChat}
-                  className="w-full flex items-center space-x-4 px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                  className="cursor-pointer w-full flex items-center space-x-4 px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -491,7 +491,7 @@ const Chatbot = ({ user }) => {
               </motion.div>
               <motion.div variants={sidebarChildItemVariants} className="flex-1 overflow-y-auto">
                 <div className="p-6">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                  <h3 className="cursor-default text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
                     Riwayat Percakapan
                   </h3>
                   <div className="space-y-2">
@@ -523,7 +523,7 @@ const Chatbot = ({ user }) => {
                         {chatHistory.length > 1 && (
                           <button
                             onClick={(e) => deleteChat(chat.id, e)}
-                            className={`opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-opacity ${
+                            className={`cursor-pointer opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-opacity ${
                               currentChatId === chat.id ? "hover:bg-red-600" : "hover:bg-gray-200"
                             }`}
                           >
@@ -555,7 +555,7 @@ const Chatbot = ({ user }) => {
           {!isSidebarOpen && (
             <motion.button
               onClick={() => setIsSidebarOpen(true)}
-              className="fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              className="cursor-pointer fixed top-1/2 left-0 z-30 transform -translate-y-1/2 bg-[#ff3131] hover:bg-red-600 text-white shadow-lg transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               style={{
                 width: "32px",
                 height: "64px",
@@ -583,7 +583,7 @@ const Chatbot = ({ user }) => {
           <div className="flex-1 overflow-y-auto pt-20 lg:pt-16 pb-40">
             {messages.length === 0 ? (
               <div className="h-full flex items-center justify-center px-8 lg:px-16 py-8 lg:py-12">
-                <div className="text-center max-w-4xl w-full">
+                <div className="cursor-default text-center max-w-4xl w-full">
                   <h2 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-6">Halo, {user?.username || ""}!</h2>
                   <p className="text-gray-600 mb-8 lg:mb-12 text-lg lg:text-xl">
                     Aku adalah Diagnify AI. Ada yang bisa Aku bantu hari ini?
@@ -678,7 +678,7 @@ const Chatbot = ({ user }) => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Ketik di sini"
-                  className="w-full px-6 py-4 border border-gray-300 rounded-2xl resize-none text-base leading-relaxed"
+                  className="w-full px-6 py-4 border-2 border-gray-300 focus:border-[#ff3131] focus:outline-none transition-colors rounded-2xl resize-none text-base leading-relaxed"
                   style={{ minHeight: "56px", maxHeight: "140px" }}
                   disabled={isLoading}
                 />
@@ -686,7 +686,7 @@ const Chatbot = ({ user }) => {
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
+                className="cursor-pointer flex-shrink-0 w-14 h-14 bg-[#ff3131] hover:scale-105 hover:shadow-[0_0_40px_#b81414] duration-300 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center focus:ring-2 focus:ring-[#ff3131] focus:ring-offset-2"
               >
                 {isLoading ? (
                   <LoadingSpinner size="sm" />
@@ -702,7 +702,7 @@ const Chatbot = ({ user }) => {
                 )}
               </button>
             </form>
-            <div className="mt-3 px-1 max-w-6xl mx-auto">
+            <div className="cursor-default mt-3 px-1 max-w-6xl mx-auto">
               <p className="text-sm text-gray-500">
                 Tekan Enter untuk mengirim pesan, Shift + Enter untuk membuat baris baru.
               </p>
