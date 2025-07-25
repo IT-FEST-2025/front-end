@@ -73,6 +73,21 @@ const Profile = ({ user = {}, onUserUpdate }) => {
     }
   }, [showImageCropper])
 
+  // Add this useEffect after the existing cropping modal useEffect
+  useEffect(() => {
+    if (showImageViewer) {
+      // Prevent body scroll
+      document.body.style.overflow = "hidden"
+      document.body.style.touchAction = "none"
+
+      return () => {
+        // Restore body scroll
+        document.body.style.overflow = "unset"
+        document.body.style.touchAction = "auto"
+      }
+    }
+  }, [showImageViewer])
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -550,11 +565,47 @@ const Profile = ({ user = {}, onUserUpdate }) => {
 
       if (response.ok && result.status === "success") {
         setShowSuccessPopup(true)
+
+        // Update local formData state with the saved changes
+        setFormData((prev) => ({
+          ...prev,
+          fullName: filteredUpdateFields.full_name !== undefined ? filteredUpdateFields.full_name || "" : prev.fullName,
+          gender: filteredUpdateFields.gender !== undefined ? filteredUpdateFields.gender || "" : prev.gender,
+          age:
+            filteredUpdateFields.age !== undefined
+              ? filteredUpdateFields.age !== null
+                ? filteredUpdateFields.age.toString()
+                : ""
+              : prev.age,
+          height:
+            filteredUpdateFields.height_cm !== undefined
+              ? filteredUpdateFields.height_cm !== null
+                ? filteredUpdateFields.height_cm.toString()
+                : ""
+              : prev.height,
+          weight:
+            filteredUpdateFields.weight_kg !== undefined
+              ? filteredUpdateFields.weight_kg !== null
+                ? filteredUpdateFields.weight_kg.toString()
+                : ""
+              : prev.weight,
+          isActiveSmoker:
+            filteredUpdateFields.smoking_status !== undefined
+              ? filteredUpdateFields.smoking_status === "aktif"
+                ? "Ya"
+                : "Tidak"
+              : prev.isActiveSmoker,
+          medicalHistory:
+            filteredUpdateFields.chronic_diseases !== undefined
+              ? filteredUpdateFields.chronic_diseases.join(", ")
+              : prev.medicalHistory,
+        }))
+
         if (onUserUpdate) {
           // Buat objek user baru dengan bidang yang diperbarui
           const updatedUser = { ...user }
           if (filteredUpdateFields.username !== undefined) updatedUser.username = filteredUpdateFields.username
-          if (filteredUpdateFields.fullName !== undefined) updatedUser.fullName = filteredUpdateFields.fullName
+          if (filteredUpdateFields.full_name !== undefined) updatedUser.fullName = filteredUpdateFields.full_name
           if (filteredUpdateFields.email !== undefined) updatedUser.email = filteredUpdateFields.email
           if (filteredUpdateFields.gender !== undefined) updatedUser.gender = filteredUpdateFields.gender
           if (filteredUpdateFields.age !== undefined) updatedUser.age = filteredUpdateFields.age
@@ -604,8 +655,13 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       {/* Image Viewer Modal */}
       {showImageViewer && profileImage && (
         <div
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }}
+          className="fixed inset-0 flex items-center justify-center z-50 p-4 overflow-hidden"
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.75)",
+            touchAction: "none",
+          }}
+          onTouchMove={(e) => e.preventDefault()}
+          onWheel={(e) => e.preventDefault()}
         >
           <div className="relative max-w-4xl max-h-full">
             <button
@@ -733,11 +789,16 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                 <button
                   onClick={handleCropImage}
                   disabled={!imageLoaded || isLoading}
-                  className="px-4 py-2 bg-[#ff3131] text-white rounded-lg hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center space-x-2"
+                  className="px-4 py-2 bg-[#ff3131] text-white rounded-lg hover:bg-red-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   {isLoading ? (
                     <>
-                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
                         <circle
                           className="opacity-25"
                           cx="12"
@@ -750,9 +811,9 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                           className="opacity-75"
                           fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 4 9.018C14.865 18.072 18 15.189 18 12a8 8 0 01-8-8z"
-                        ></path>
+                        />
                       </svg>
-                      <span>Memproses...</span>
+                      <span>Loading...</span>
                     </>
                   ) : (
                     <span>Gunakan Foto</span>
@@ -819,7 +880,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 0 00-1 1v3M4 7h16"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 0 00-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 0 00-1 1v3M4 7h16"
                             />
                           </svg>
                         </button>
