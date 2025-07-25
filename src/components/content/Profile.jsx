@@ -42,10 +42,6 @@ const Profile = ({ user = {}, onUserUpdate }) => {
 
   // Add zoom state after existing state declarations
   const [imageDisplaySize, setImageDisplaySize] = useState({ width: 0, height: 0 })
-
-  // Hapus fungsi fetchUserData dan useEffect terkait
-  // useEffect(() => { fetchUserData() }, [])
-
   // Perbarui formData dan profileImage saat prop user berubah
   useEffect(() => {
     setFormData({
@@ -104,8 +100,11 @@ const Profile = ({ user = {}, onUserUpdate }) => {
   const handleImageLoad = () => {
     if (imageRef.current) {
       const { naturalWidth, naturalHeight } = imageRef.current
-      const containerMaxWidth = 500 // Max display width
-      const containerMaxHeight = 400 // Max display height
+
+      // Get container dimensions with mobile considerations
+      const isMobile = window.innerWidth < 768
+      const containerMaxWidth = isMobile ? Math.min(350, window.innerWidth - 32) : 500
+      const containerMaxHeight = isMobile ? Math.min(300, window.innerHeight * 0.4) : 400
 
       // Calculate display size while maintaining aspect ratio
       const aspectRatio = naturalWidth / naturalHeight
@@ -123,9 +122,9 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       setImageDisplaySize({ width: displayWidth, height: displayHeight })
       setImageLoaded(true)
 
-      // Reset crop to center with appropriate size
+      // Reset crop to center with appropriate size for mobile
       const minDimension = Math.min(displayWidth, displayHeight)
-      const initialSize = Math.min(200, minDimension * 0.8)
+      const initialSize = Math.min(isMobile ? 150 : 200, minDimension * 0.7)
       setCropData({
         x: (displayWidth - initialSize) / 2,
         y: (displayHeight - initialSize) / 2,
@@ -188,14 +187,18 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       const ratio = currentDistance / resizeStart.initialDistance
       let newSize = Math.round(resizeStart.initialSize * ratio)
 
-      // Constrain size based on display dimensions
+      // Constrain size based on display dimensions with better mobile handling
       const minSize = 50
-      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.9
+      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.85
       newSize = Math.max(minSize, Math.min(newSize, maxSize))
 
-      // Calculate new position to keep center
-      const newX = Math.max(0, Math.min(resizeStart.x - newSize / 2, imageDisplaySize.width - newSize))
-      const newY = Math.max(0, Math.min(resizeStart.y - newSize / 2, imageDisplaySize.height - newSize))
+      // Calculate new position to keep center within bounds
+      let newX = resizeStart.x - newSize / 2
+      let newY = resizeStart.y - newSize / 2
+
+      // Ensure crop box stays within image bounds
+      newX = Math.max(0, Math.min(newX, imageDisplaySize.width - newSize))
+      newY = Math.max(0, Math.min(newY, imageDisplaySize.height - newSize))
 
       setCropData({
         x: newX,
@@ -203,6 +206,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         size: newSize,
       })
     } else if (isDragging) {
+      // Ensure dragging stays within bounds
       const newX = Math.max(0, Math.min(x - dragStart.x, imageDisplaySize.width - cropData.size))
       const newY = Math.max(0, Math.min(y - dragStart.y, imageDisplaySize.height - cropData.size))
 
@@ -276,14 +280,18 @@ const Profile = ({ user = {}, onUserUpdate }) => {
       const ratio = currentDistance / resizeStart.initialDistance
       let newSize = Math.round(resizeStart.initialSize * ratio)
 
-      // Constrain size based on display dimensions
+      // Constrain size based on display dimensions with better mobile handling
       const minSize = 50
-      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.9
+      const maxSize = Math.min(imageDisplaySize.width, imageDisplaySize.height) * 0.85
       newSize = Math.max(minSize, Math.min(newSize, maxSize))
 
-      // Calculate new position to keep center
-      const newX = Math.max(0, Math.min(resizeStart.x - newSize / 2, imageDisplaySize.width - newSize))
-      const newY = Math.max(0, Math.min(resizeStart.y - newSize / 2, imageDisplaySize.height - newSize))
+      // Calculate new position to keep center within bounds
+      let newX = resizeStart.x - newSize / 2
+      let newY = resizeStart.y - newSize / 2
+
+      // Ensure crop box stays within image bounds
+      newX = Math.max(0, Math.min(newX, imageDisplaySize.width - newSize))
+      newY = Math.max(0, Math.min(newY, imageDisplaySize.height - newSize))
 
       setCropData({
         x: newX,
@@ -291,6 +299,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
         size: newSize,
       })
     } else if (isDragging) {
+      // Ensure dragging stays within bounds
       const newX = Math.max(0, Math.min(x - dragStart.x, imageDisplaySize.width - cropData.size))
       const newY = Math.max(0, Math.min(y - dragStart.y, imageDisplaySize.height - cropData.size))
 
@@ -646,7 +655,7 @@ const Profile = ({ user = {}, onUserUpdate }) => {
 
             <div className="space-y-4">
               {/* Image with crop overlay */}
-              <div className="flex justify-center">
+              <div className="flex justify-center overflow-hidden">
                 <div
                   className="relative inline-block select-none touch-none"
                   onMouseMove={(e) => {
@@ -667,8 +676,8 @@ const Profile = ({ user = {}, onUserUpdate }) => {
                     style={{
                       width: imageDisplaySize.width,
                       height: imageDisplaySize.height,
-                      maxWidth: "100%",
-                      maxHeight: "400px",
+                      maxWidth: "calc(100vw - 64px)",
+                      maxHeight: "60vh",
                       objectFit: "contain",
                     }}
                     onLoad={handleImageLoad}
